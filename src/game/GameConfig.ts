@@ -26,7 +26,7 @@ export class GameConfig extends JetLagConfig {
     this.adaptToScreenSize = true;
     this.pixelMeterRatio = 100;
     this.canVibrate = true;
-    this.debugMode = true; //this is the green lines
+    this.debugMode = false; //this is the green lines
     this.forceAccelerometerOff = true;
     this.verbosity = JetLagVerbosity.LOUD;
 
@@ -41,6 +41,7 @@ export class GameConfig extends JetLagConfig {
     // list the images that the game will use
     this.imageNames = [
       // The non-animated actors in the game
+      "astro_side.png",
       "greenball.png", "mustardball.png", "redball.png", "blueball.png",
       "purpleball.png", "greyball.png",
       // Images that we use for buttons in the Splash and Chooser
@@ -76,7 +77,7 @@ export class GameConfig extends JetLagConfig {
       //curriculum object
       "question_box.png",
       //question related pictures
-      "answer_bar.png", "question_bar.png"
+      "answer_bar.png", "question_bar.png", "wrong_bar.png", "right_bar.png"
     ];
 
     // list the sound effects that the game will use
