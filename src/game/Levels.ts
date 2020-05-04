@@ -22,9 +22,6 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     // This line ensures that, no matter what level we draw, the ESCAPE key is configured to go back to the Chooser
     jl.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doChooser(Math.ceil(index / 24)); });
 
-    // In this level, all we have is a hero (the green ball) who needs to make it to the destination (a mustard colored
-    // ball). The game is configured to use tilt to control the world.  If you're running on a computer, arrow keys will
-    // simulate tilt.
     if (index == 1) {
         jl.world.setCameraBounds(160, 9);
         jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
@@ -34,28 +31,16 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         h.setPhysics(5, 0, 0.6);
         h.addVelocity(1, 0);
         jl.world.setCameraChase(h);
-        jl.world.makeDestination({ x: 159, y: 0, width: 1, height: 1, img: "mustardball.png" });
-        jl.score.setVictoryDestination(1);
 
         // set up our background, with a few layers
         jl.world.setBackgroundColor(0x101010);
         //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
-        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_moon.png"}, 1);
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_moon.png"}, 0);
         //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
         jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
 
-        // // place a speed-up obstacle that lasts for 2 seconds
-        // let o1 = jl.world.makeObstacle({ x: 20, y: 0, width: 1, height: 1, img: "rightarrow.png" });
-        // o1.setSpeedBoost(5, 0, 2);
-        // // place a slow-down obstacle that lasts for 3 seconds
-        // let o2 = jl.world.makeObstacle({ x: 60, y: 0, width: 1, height: 1, img: "leftarrow.png" });
-        // o2.setSpeedBoost(-2, 0, 3);
-        // // place a permanent +3 speedup obstacle... the -1 means "forever"
-        // let o3 = jl.world.makeObstacle({ x: 80, y: 0, width: 1, height: 1, img: "purpleball.png" });
-        // o3.setSpeedBoost(3, 0, -1);
 
         //welcomeMessage(jl, "Speed boosters and reducers");
-        winMessage(jl, "Great Job");
         loseMessage(jl, "Try Again");
 
         let score = 0;
@@ -291,6 +276,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                 return true;
            });
             overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
+            console.log(score);
         });
         return true;
 };
@@ -370,6 +356,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                     return true;
                });
                 overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "3");
+                console.log(score);
             });
             return true;
     };
@@ -640,6 +627,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                     a13.remove(true);
                     a14.remove(true);
                     overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                        winMessage(jl, score);
                         jl.nav.dismissOverlayScene();
                         return true;
                     })
@@ -653,6 +641,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                     a13.remove(true);
                     a14.remove(true);
                     overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                        winMessage(jl, score);
                         jl.nav.dismissOverlayScene();
                         return true;
                     })
@@ -666,6 +655,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                     a13.remove(true);
                     a14.remove(true);
                     overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                        winMessage(jl, score);
                         jl.nav.dismissOverlayScene();
                         return true;
                     })
@@ -680,6 +670,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                     a14.remove(true);
                     overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
                         score = score + 1;
+                        winMessage(jl, score);
                         jl.nav.dismissOverlayScene();
                         return true;
                     })
@@ -693,26 +684,8 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
     // No transfer of momeuntum when the hero collides with the trigger
     trigger8.setCollisionsEnabled(false);
 
-    let trigger9 = jl.world.makeObstacle({ box: true, x: 125, y: 2, width: 4.5, height: 5, img: "flag.png" });
-    
-        let lc9 =
-        (thisActor: Obstacle, collideActor: Hero) => {
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "entire_background.png" }, (hudx: number, hudY: number) => {
-                    jl.nav.dismissOverlayScene();
-                    return true;
-                });
-
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#ffffff", size: 100, z: 0 }, () => "CONGRATULATIONS!");
-                overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#ffffff", size: 80, z: 0 }, () => "Your score is " + score + "/8");
-
-            });
-            return true;
-    };
-    trigger9.setHeroCollisionCallback(lc9);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger9.setCollisionsEnabled(false);
-
+    jl.world.makeDestination({ x: 125, y: 2, width: 4.5, height: 5, img: "flag.png" });
+    jl.score.setVictoryDestination(1);
 }
     // Show how to make an "infinite" level, and add a foreground layer
     else if (index == 2) {
@@ -730,7 +703,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
         // set up our background, with a few layers
         jl.world.setBackgroundColor(0x101010);
         //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
-        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl2_moon.png"}, 1);
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl2_moon.png"}, 0);
         //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
         jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
 
@@ -745,7 +718,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
         // o3.setSpeedBoost(3, 0, -1);
 
         //welcomeMessage(jl, "Speed boosters and reducers");
-        winMessage(jl, "Great Job");
+        //winMessage(jl, "Great Job");
         loseMessage(jl, "Try Again");
 
         let score = 0;
@@ -1331,6 +1304,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                     a14.remove(true);
                     overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
                         score = score + 1;
+                        winMessage(jl, score);
                         jl.nav.dismissOverlayScene();
                         return true;
                     })
@@ -1344,6 +1318,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                     a13.remove(true);
                     a14.remove(true);
                     overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                        winMessage(jl, score);
                         jl.nav.dismissOverlayScene();
                         return true;
                     })
@@ -1357,6 +1332,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                     a13.remove(true);
                     a14.remove(true);
                     overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                        winMessage(jl, score);
                         jl.nav.dismissOverlayScene();
                         return true;
                     })
@@ -1370,18 +1346,23 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                     a13.remove(true);
                     a14.remove(true);
                     overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                        winMessage(jl, score);
                         jl.nav.dismissOverlayScene();
                         return true;
                     })
                     return true;
                });
                 overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "2");
+
             });
             return true;
     };
     trigger8.setHeroCollisionCallback(lc8);
     // No transfer of momeuntum when the hero collides with the trigger
     trigger8.setCollisionsEnabled(false);
+
+    jl.world.makeDestination({ x: 125, y: 2, width: 4.5, height: 5, img: "flag.png" });
+    jl.score.setVictoryDestination(1);
 }
 
     // In this level, we change the physics from level 2 so that things roll and bounce a little bit more nicely.
@@ -1400,7 +1381,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
             // set up our background, with a few layers
             jl.world.setBackgroundColor(0x101010);
             //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
-            jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl3_moon.png"}, 1);
+            jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl3_moon.png"}, 0);
             //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
             jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
 
@@ -1415,7 +1396,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
             // o3.setSpeedBoost(3, 0, -1);
     
             //welcomeMessage(jl, "Speed boosters and reducers");
-            winMessage(jl, "Great Job");
+            //winMessage(jl, "Great Job");
             loseMessage(jl, "Try Again");
 
             let score = 0;
@@ -1441,7 +1422,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                             return true;
                         });
                         //welcomeMessage(jl, "Reach the destination\nto win this level");
-                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 35, z: 0 }, () => "Question 17: I bought a bag a fruit candies at the store.\nThere were 55 candies in the bag. I want to share with 5 friends.\nHow many will each friend get?");
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 35, z: 0 }, () => "Question 17: I bought a bag of fruit candies at the store.\nThere were 55 candies in the bag. I want to share with 5 friends.\nHow many will each friend get?");
                     
                         let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
                             a11.remove(true);    
@@ -1598,7 +1579,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                 overlay.addTapControl({ x: 2, y: .25, width: 12, height: 3, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
                     return true;
                 });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 19: Mom baked 36 cookies. She put 9 cookies in bag.\nHow many cookies were in each bag?");
+                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 19: Mom baked 36 cookies. She divided the cookies into 9 bags.\nHow many cookies were in each bag?");
             
                 let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
                     a11.remove(true);    
@@ -1855,7 +1836,8 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                         a12.remove(true);
                         a13.remove(true);
                         a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
+                            score = score + 1;
                             jl.nav.dismissOverlayScene();
                             return true;
                         })
@@ -1881,8 +1863,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                         a12.remove(true);
                         a13.remove(true);
                         a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                            score = score + 1;
+                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
                             jl.nav.dismissOverlayScene();
                             return true;
                         })
@@ -2002,6 +1983,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                         a14.remove(true);
                         overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
                             score = score + 1;
+                            winMessage(jl, score);
                             jl.nav.dismissOverlayScene();
                             return true;
                         })
@@ -2015,6 +1997,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                         a13.remove(true);
                         a14.remove(true);
                         overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                            winMessage(jl, score);
                             jl.nav.dismissOverlayScene();
                             return true;
                         })
@@ -2028,6 +2011,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                         a13.remove(true);
                         a14.remove(true);
                         overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
+                            winMessage(jl, score);
                             jl.nav.dismissOverlayScene();
                             return true;
                         })
@@ -2041,6 +2025,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                         a13.remove(true);
                         a14.remove(true);
                         overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                            winMessage(jl, score);
                             jl.nav.dismissOverlayScene();
                             return true;
                         })
@@ -2054,10 +2039,12 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
         // No transfer of momeuntum when the hero collides with the trigger
         trigger8.setCollisionsEnabled(false);
 
+        jl.world.makeDestination({ x: 125, y: 2, width: 4.5, height: 5, img: "flag.png" });
+        jl.score.setVictoryDestination(1);
 
     }
     // Put the level number in the top right corner of every level
-    jl.hud.addText({ x: 15, y: .5, face: "arial", color: "#872436", size: 22, z: 2 }, () => "Level " + index);
+    jl.hud.addText({ x: 15, y: .5, face: "arial", color: "#fcba03", size: 22, z: 2 }, () => "Level " + index);
 }
 
 /**
@@ -2100,17 +2087,31 @@ export function questionScreen(jl: JetLagApi, message: string) {
  * This is a standard way of drawing a black screen with some text, to serve as
  * the win screen for the game
  */
-export function winMessage(jl: JetLagApi, message: string, callback: () => void = null) {
+export function winMessage(jl: JetLagApi, score: Number, callback: () => void = null) {
     jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
-        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, () => {
+        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "entire_background.png" }, () => {
             jl.nav.nextLevel();
             return true;
         });
-        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
+        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#ffffff", size: 100, z: 0 }, () => "CONGRATULATIONS!");
+        overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#ffffff", size: 80, z: 0 }, () => "Your score is " + score + "/8");
+        //overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
         if (callback !== null)
             callback();
     });
 }
+
+// jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+//     overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "entire_background.png" }, (hudx: number, hudY: number) => {
+//         jl.nav.dismissOverlayScene();
+//         return true;
+//     });
+
+//     overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#ffffff", size: 100, z: 0 }, () => "CONGRATULATIONS!");
+//     overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#ffffff", size: 80, z: 0 }, () => "Your score is " + score + "/8");
+
+// });
+// return true;
 
 /**
  * This is a standard way of drawing a black screen with some text, to serve as
