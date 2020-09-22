@@ -73,15 +73,23 @@ export class GameConfig extends JetLagConfig {
       //Astronaut animation
       "1.png", "2.png","3.png","4.png","5.png","6.png",
       //Game intro background
-      "planets.png", "planets_level.png", "splash_background.png",
+      "planets.png", "planets_level.png", "splash_background.png", "earth.png",
       //level backgrounds
       "lvl1_background.png", "lvl1_moon.png", "lvl1_stars.png", "lvl2_moon.png", "lvl2_stars.png", "lvl3_moon.png", "lvl3_stars.png", "entire_background.png",
       //curriculum object
       "question_box.png","question_box 2.png","question_box 3.png","question_box 4.png","question_box 5.png","question_box 6.png", "blank.png",
       //question related pictures
       "answer_bar.png", "question_bar.png", "wrong_bar.png", "right_bar.png", "hint.png", "hint_bar.png",
+      //rockets
+      "rocket.png", "space_shuttle_screen.png",
+      //star backgrounds
+      "teeny_stars.png", "only_big_stars.png", "background_small_stars.png", "Full_background.png", "inside_spaceship.png", 
       //flag
       "flag.png",
+      //writing
+      "welcome.png",
+      //screens
+      "add_on.png", "draw_a_picture.png", "lets_learn.png", "skip_count.png",
     ];
 
     // list the sound effects that the game will use

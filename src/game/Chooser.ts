@@ -32,6 +32,7 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
         // the bottom, and three rows of eight buttons each, with each button
         // 1.25x1.25 meters, and .5 meters between them
         //drawLevelButton(jl: JetLagApi, x: number, y: number, width: number, height: number, whichLevel: number)
+        drawLevelButton(jl, 1, 4.75, 2, 2, 4);
         drawLevelButton(jl, 2.80, 4.75, 2, 2, 1);
         drawLevelButton(jl, 5.25, 2.50, 2, 2, 2);
         drawLevelButton(jl, 8.50, 1.50, 2, 2, 3);

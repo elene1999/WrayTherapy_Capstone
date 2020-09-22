@@ -36,6 +36,123 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // set up our background, with a few layers
         jl.world.setBackgroundColor(0x101010);
         //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "earth.png"}, 0);
+        //jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_moon.png"}, 0);
+        //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
+        //jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
+
+
+        //welcomeMessage(jl, "Speed boosters and reducers");
+        //loseMessage(jl, "Try Again");
+
+        
+        jl.world.makeDestination({box: true, x: 7, y: 0, width: 5, height: 8, img: "rocket.png" });
+        jl.score.setVictoryDestination(0);
+
+        
+    }       
+
+    if (index == 2) {
+        jl.world.setCameraBounds(16, 70);
+        jl.world.enableTilt(0, 10);
+        jl.world.drawBoundingBox(0, -100, 16, 200, "", 1, 0, 1);
+        let h = jl.world.makeHero({box:true,  x: 5, y: 50, width: 5, height: 8, img: "rocket.png" });
+        jl.world.setCameraChase(h);
+        h.setPhysics(5, 0, 0.6);
+        h.addVelocity(0, -1);
+        h.setMoveByTilting();
+        jl.world.setCameraChase(h);
+
+        // Win by reaching the bottom
+       
+
+        //"teeny_stars.png", "only_big_stars.png", "background_small_stars.png",,
+        // set up vertical scrolling backgrounds
+        jl.world.setBackgroundColor(0xFF00FF);
+        jl.world.addVerticalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "background_small_stars.png"}, .25);
+        jl.world.addVerticalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "teeny_stars.png"}, 0);
+        jl.world.addVerticalBackgroundLayer({ x: 0, y: 5, width: 16, height: 9, img: "only_big_stars.png"}, .25);
+
+        jl.world.makeDestination({ x: 5, y: 3, width: 15, height:5, img: "starburst1.png" });
+        jl.score.setVictoryDestination(1);
+
+        //welcomeMessage(jl, "Vertical scroller demo");
+        //winMessage(jl, "Great Job");
+        //loseMessage(jl, "Try Again");
+    }
+
+    if (index == 3) {
+        jl.world.setCameraBounds(160, 9);
+        jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
+        //let h = jl.world.makeHero({ x: 0, y: 3, width: 2, height: 4, img: "astro_side.png" });
+        //h.setDefaultAnimation(jl.makeAnimation(200, true, ["1.png", "2.png","3.png","4.png","5.png","6.png",]));
+        //h.disableRotation();
+       // h.setPhysics(5, 0, 0.6);
+        //h.addVelocity(1, 0);
+        //jl.world.setCameraChase(h);
+
+        // set up our background, with a few layers
+        //jl.world.setBackgroundColor(0x101010);
+    
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "inside_spaceship.png"}, 0);
+        //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
+        //jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
+
+        
+
+        //jl.world.drawPicture({ x: 4.5, y: 1, width: 7, height: 3, img: "", z: -1 });
+
+        //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "space_shuttle_screen.png", z: -1 });
+
+
+        jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+            //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "inside_spaceship.png", z: -1 });
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "inside_spaceship.png" }, () => {
+            //jl.world.drawPicture({ x: 4.5, y: 1, width: 7, height: 3, img: "welcome.png", z: -1 });
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "lets_learn.png" }, () => {
+            //a11.remove(true);    
+            //a12.remove(true);
+            //a13.remove(true);
+            //a14.remove(true);
+            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "draw_a_picture.png"}, () => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "skip_count.png"}, () => {
+                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "add_on.png"}, () => {
+                        jl.nav.dismissOverlayScene();
+                        return true;
+                    })
+                    return true;
+                })
+                return true;
+            })
+            return true;
+            });
+            return true;
+        });
+    });
+            
+        //welcome.hidden(true); 
+
+        //welcomeMessage(jl, "Speed boosters and reducers");
+        //loseMessage("Try Again");
+
+        
+        //jl.world.makeDestination({box: true, x: 6, y: 0, width: 5, height: 8, img: "rocket.png" });
+        jl.score.setVictoryDestination(0);
+    } 
+
+    if (index == 4) {
+        jl.world.setCameraBounds(160, 9);
+        jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
+        let h = jl.world.makeHero({ x: 0, y: 3, width: 2, height: 4, img: "astro_side.png" });
+        h.setDefaultAnimation(jl.makeAnimation(200, true, ["1.png", "2.png","3.png","4.png","5.png","6.png",]));
+        h.disableRotation();
+        h.setPhysics(5, 0, 0.6);
+        h.addVelocity(1, 0);
+        jl.world.setCameraChase(h);
+
+        // set up our background, with a few layers
+        jl.world.setBackgroundColor(0x101010);
+        //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
         jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_moon.png"}, 0);
         //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
         jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
@@ -689,7 +806,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
     jl.score.setVictoryDestination(1);
 }
     // Show how to make an "infinite" level, and add a foreground layer
-    else if (index == 2) {
+    else if (index == 5) {
         jl.world.setCameraBounds(160, 9);
         jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
         let h = jl.world.makeHero({ x: 0, y: 3, width: 2, height: 4, img: "astro_side.png" });
@@ -1367,7 +1484,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
 }
 
     // In this level, we change the physics from level 2 so that things roll and bounce a little bit more nicely.
-    else if (index == 3) {
+    else if (index == 6) {
             jl.world.setCameraBounds(160, 9);
             jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
             let h = jl.world.makeHero({ x: 0, y: 3, width: 2, height: 4, img: "astro_side.png" });
@@ -1430,7 +1547,7 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
                             a12.remove(true);
                             a13.remove(true);
                             a14.remove(true);
-                            overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wronng_bar.png" }, () => {
+                            overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
                                 jl.nav.dismissOverlayScene();
                                 return true;
                             })
