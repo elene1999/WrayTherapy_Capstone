@@ -40,10 +40,17 @@ export class PointToActorCallback extends b2QueryCallback {
         // fixture must be active
         if (fixture.TestPoint(this.touchVector)) {
             let b = fixture.GetBody().GetUserData() as BaseActor;
-            if (b.getEnabled()) {
+            // if (b.getEnabled()) {
+            // //if (b.getEnabled() & b.tapHandler() != null) {
+            //     //make tapHandler null or call gettapHandler 
+            //     this.foundActor = b;
+            //     return false;
+            // }
+            if (b.getTapHandler()) {
                 this.foundActor = b;
                 return false;
             }
+            
         }
         return true;
     }

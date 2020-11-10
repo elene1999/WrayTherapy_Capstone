@@ -23,11 +23,133 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     // This line ensures that, no matter what level we draw, the ESCAPE key is configured to go back to the Chooser
     jl.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doChooser(Math.ceil(index / 24)); });
 
+    //tutorial
     if (index == 1) {
         jl.world.setCameraBounds(160, 9);
         jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({ x: 0, y: 3, width: 2, height: 4, img: "astro_side.png" });
-        h.setDefaultAnimation(jl.makeAnimation(200, true, ["1.png", "2.png","3.png","4.png","5.png","6.png",]));
+        let h = jl.world.makeHero({ x: 0, y: 5, width: 2, height: 6, img: "a1.png" });
+        h.setDefaultAnimation(jl.makeAnimation(25, true, [
+        "a1.png", "a2.png", "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
+        "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
+        "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a28.png", "a29.png", "a30.png", 
+        "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
+        "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
+        h.disableRotation();
+        h.setPhysics(5, 0, 0.6);
+        h.addVelocity(1, 0);
+        jl.world.setCameraChase(h);
+
+        // set up our background, with a few layers
+        jl.world.setBackgroundColor(0x101010);
+        //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_moon.png"}, 0);
+        //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
+
+
+        //welcomeMessage(jl, "Speed boosters and reducers");
+        loseMessage(jl, "Try Again");
+
+        let score = 0;
+
+        let trigger1 = jl.world.makeObstacle({ box: true, x: 15, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 10).to("question_box 1.png", 10), 0, 0, .5, .5);
+        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 200).to("question_box 1.png", 200).to("starburst1.png", 200).to("starburst4.png", 200), 0, 0, .5, .5);
+        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 10).to("question_box 1.png", 10), 0, 0, .5, .5);
+
+        let lc =
+        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
+        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
+        // Also move the obstacle forward, so we can hit it again.
+        (thisActor: Obstacle, collideActor: Hero) => {
+                thisActor.remove(true);
+                jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                    //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#101010", size: 32, z: 0 }, () => "Game Paused");
+                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
+                        return true;
+                    });
+
+                    overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                        return true;
+                    });
+                    overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 1: 16 ÷ 4 = ?");
+
+                    let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                        a11.remove(true);    
+                        a12.remove(true);
+                        a13.remove(true);
+                        a14.remove(true);
+                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
+                            score = score + 1;
+                            jl.nav.dismissOverlayScene();
+                            return true;
+                        })
+                        return true;
+                   });
+                    overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "4");
+
+                    let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                        a11.remove(true);    
+                        a12.remove(true);
+                        a13.remove(true);
+                        a14.remove(true);
+                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                            jl.nav.dismissOverlayScene();
+                            return true;
+                        })
+                        return true;
+                   });
+                    overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
+
+                    let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                        a11.remove(true);    
+                        a12.remove(true);
+                        a13.remove(true);
+                        a14.remove(true);
+                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                            jl.nav.dismissOverlayScene();
+                            return true;
+                        })
+                        return true;
+                   });
+                    overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
+
+                    let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                        a11.remove(true);    
+                        a12.remove(true);
+                        a13.remove(true);
+                        a14.remove(true);
+                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+                            jl.nav.dismissOverlayScene();
+                            return true;
+                        })
+                        return true;
+                   });
+                    overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "12");
+                });
+                return true;
+        };
+    trigger1.setHeroCollisionCallback(lc);
+    // No transfer of momeuntum when the hero collides with the trigger
+    trigger1.setCollisionsEnabled(false);
+
+
+    jl.world.makeDestination({ x: 20, y: 2, width: 4.5, height: 5, img: "flag.png" });
+    jl.score.setVictoryDestination(1);
+}
+    
+    //earth
+    if (index == 2) {
+        jl.world.setCameraBounds(160, 9);
+        jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
+        let h = jl.world.makeHero({ x: 0, y: 5, width: 2, height: 6, img: "a1.png" });
+        h.setDefaultAnimation(jl.makeAnimation(25, true, [
+        "a1.png", "a2.png", "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
+        "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
+        "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a28.png", "a29.png", "a30.png", 
+        "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
+        "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
+        //h.setDefaultAnimation(jl.makeAnimation(200, true, ["a1.png", "2.png","3.png","4.png","5.png","6.png",
         h.disableRotation();
         h.setPhysics(5, 0, 0.6);
         h.addVelocity(1, 0);
@@ -46,13 +168,14 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         //loseMessage(jl, "Try Again");
 
         
-        jl.world.makeDestination({box: true, x: 7, y: 0, width: 5, height: 8, img: "rocket.png" });
+        jl.world.makeDestination({box: true, x: 8, y: 2, width: 5, height: 8, img: "rocket.png" });
         jl.score.setVictoryDestination(0);
 
         
     }       
 
-    if (index == 2) {
+    //earth to space
+    if (index == 3) {
         jl.world.setCameraBounds(16, 70);
         jl.world.enableTilt(0, 10);
         jl.world.drawBoundingBox(0, -100, 16, 200, "", 1, 0, 1);
@@ -69,9 +192,9 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         //"teeny_stars.png", "only_big_stars.png", "background_small_stars.png",,
         // set up vertical scrolling backgrounds
         jl.world.setBackgroundColor(0xFF00FF);
-        jl.world.addVerticalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "background_small_stars.png"}, .25);
-        jl.world.addVerticalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "teeny_stars.png"}, 0);
-        jl.world.addVerticalBackgroundLayer({ x: 0, y: 5, width: 16, height: 9, img: "only_big_stars.png"}, .25);
+        //jl.world.addVerticalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "background_small_stars.png"}, .25);
+        //jl.world.addVerticalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "teeny_stars.png"}, 0);
+        jl.world.addVerticalBackgroundLayer({ x: 0, y: 0, width: 16, height: 45, img: "test.png"}, .25);
 
         jl.world.makeDestination({ x: 5, y: 3, width: 15, height:5, img: "starburst1.png" });
         jl.score.setVictoryDestination(1);
@@ -81,7 +204,8 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         //loseMessage(jl, "Try Again");
     }
 
-    if (index == 3) {
+    //space shuttle
+    if (index == 4) {
         jl.world.setCameraBounds(160, 9);
         jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
         //let h = jl.world.makeHero({ x: 0, y: 3, width: 2, height: 4, img: "astro_side.png" });
@@ -135,16 +259,33 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         //welcomeMessage(jl, "Speed boosters and reducers");
         //loseMessage("Try Again");
 
+        jl.hud.addTapControl({ x: 7, y: 2, width: 2, height: 1, img: "readybutton.png" }, () => {
+            jl.nav.doLevel(5);
+            return true;
+        });
+
         
-        //jl.world.makeDestination({box: true, x: 6, y: 0, width: 5, height: 8, img: "rocket.png" });
-        jl.score.setVictoryDestination(0);
+        // //jl.world.makeDestination({box: true, x: 6, y: 0, width: 5, height: 8, img: "rocket.png" });
+        // jl.score.setVictoryDestination(0);
+        // eleneMessage(jl, "Ready to try it out?");
+        // overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
+        //     jl.nav.doLevel(4);
+        // });
+        //jl.nav.doLevel(4)
+    
     } 
 
-    if (index == 4) {
+    //lvl1
+    if (index == 5) {
         jl.world.setCameraBounds(160, 9);
         jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({ x: 0, y: 3, width: 2, height: 4, img: "astro_side.png" });
-        h.setDefaultAnimation(jl.makeAnimation(200, true, ["1.png", "2.png","3.png","4.png","5.png","6.png",]));
+        let h = jl.world.makeHero({ x: 0, y: 5, width: 2, height: 6, img: "a1.png" });
+        h.setDefaultAnimation(jl.makeAnimation(25, true, [
+        "a1.png", "a2.png", "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
+        "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
+        "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a28.png", "a29.png", "a30.png", 
+        "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
+        "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
         h.disableRotation();
         h.setPhysics(5, 0, 0.6);
         h.addVelocity(1, 0);
@@ -252,6 +393,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         // Also move the obstacle forward, so we can hit it again.
         (thisActor: Obstacle, collideActor: Hero) => {
             thisActor.remove(true);
+            // ask javascript what time it is 
             jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                 //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
                 overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
@@ -310,6 +452,10 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                     a14.remove(true);
                     overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
                         jl.nav.dismissOverlayScene();
+                        //ask javascript for stop time - performance.now()
+                        //compute difference
+                        //send to server
+                        // POST for record
                         return true;
                     })
                     return true;
@@ -804,13 +950,19 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
 
     jl.world.makeDestination({ x: 125, y: 2, width: 4.5, height: 5, img: "flag.png" });
     jl.score.setVictoryDestination(1);
-}
-    // Show how to make an "infinite" level, and add a foreground layer
-    else if (index == 5) {
+    }
+
+    //lvl2
+    else if (index == 6) {
         jl.world.setCameraBounds(160, 9);
         jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({ x: 0, y: 3, width: 2, height: 4, img: "astro_side.png" });
-        h.setDefaultAnimation(jl.makeAnimation(200, true, ["1.png", "2.png","3.png","4.png","5.png","6.png",]));
+        let h = jl.world.makeHero({ x: 0, y: 5, width: 2, height: 6, img: "a1.png" });
+        h.setDefaultAnimation(jl.makeAnimation(25, true, [
+        "a1.png", "a2.png", "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
+        "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
+        "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a28.png", "a29.png", "a30.png", 
+        "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
+        "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
         h.disableRotation();
         h.setPhysics(5, 0, 0.6);
         h.addVelocity(1, 0);
@@ -1483,12 +1635,17 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
     jl.score.setVictoryDestination(1);
 }
 
-    // In this level, we change the physics from level 2 so that things roll and bounce a little bit more nicely.
-    else if (index == 6) {
+    // lvl3
+    else if (index == 7) {
             jl.world.setCameraBounds(160, 9);
             jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
-            let h = jl.world.makeHero({ x: 0, y: 3, width: 2, height: 4, img: "astro_side.png" });
-            h.setDefaultAnimation(jl.makeAnimation(200, true, ["1.png", "2.png","3.png","4.png","5.png","6.png",]));
+            let h = jl.world.makeHero({ x: 0, y: 5, width: 2, height: 6, img: "a1.png" });
+            h.setDefaultAnimation(jl.makeAnimation(25, true, [
+            "a1.png", "a2.png", "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
+            "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
+            "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a28.png", "a29.png", "a30.png", 
+            "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
+            "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
             h.disableRotation();
             h.setPhysics(5, 0, 0.6);
             h.addVelocity(1, 0);
@@ -2219,6 +2376,18 @@ export function winMessage(jl: JetLagApi, score: Number, callback: () => void = 
     });
 }
 
+export function eleneMessage(jl: JetLagApi, message: string, callback: () => void = null) {
+    jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
+        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, () => {
+            jl.nav.nextLevel();
+            return true;
+        });
+        overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
+        if (callback !== null)
+            callback();
+    });
+}
+
 // jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
 //     overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "entire_background.png" }, (hudx: number, hudY: number) => {
 //         jl.nav.dismissOverlayScene();
@@ -2246,3 +2415,4 @@ export function loseMessage(jl: JetLagApi, message: string, callback: () => void
             callback();
     });
 }
+
