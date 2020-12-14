@@ -8,6 +8,9 @@ import { Hero } from "../jetlag/actor/Hero";
 import { JetLagKeys } from "../jetlag/support/JetLagKeys";
 import { Obstacle } from "../jetlag/actor/Obstacle";
 
+//import { Interface } from "readline";
+//import { BaseActor } from "../jetlag/actor/BaseActor";
+
 /**
  * buildLevelScreen is used to draw the playable levels of the game
  * hi
@@ -18,278 +21,44 @@ import { Obstacle } from "../jetlag/actor/Obstacle";
  * @param index Which level should be displayed
  * @param jl    The JetLag object, for putting stuff into the level
  */
-export function buildLevelScreen(index: number, jl: JetLagApi): void {
+
+export interface array_entry {
+    questionId: any
+    correct: any
+    time: any
+    picked: any
+}
+
+let score = 0;
+
+let game_start: number;
+let game_end: number;
+
+let flag = false;
+
+export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<void> {
 
     // This line ensures that, no matter what level we draw, the ESCAPE key is configured to go back to the Chooser
     jl.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doChooser(Math.ceil(index / 24)); });
 
     //tutorial
-    if (index == 1) {
-        jl.world.setCameraBounds(160, 9);
-        jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({ x: 0, y: 5, width: 2, height: 6, img: "a1.png" });
-        h.setDefaultAnimation(jl.makeAnimation(25, true, [
-        "a1.png", "a2.png", "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
-        "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
-        "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a28.png", "a29.png", "a30.png", 
-        "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
-        "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
-        h.disableRotation();
-        h.setPhysics(5, 0, 0.6);
-        h.addVelocity(1, 0);
-        jl.world.setCameraChase(h);
-
-        // set up our background, with a few layers
-        jl.world.setBackgroundColor(0x101010);
-        //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
-        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_moon.png"}, 0);
-        //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
-        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
-
-
-        //welcomeMessage(jl, "Speed boosters and reducers");
-        loseMessage(jl, "Try Again");
-
-        let score = 0;
-
-        let trigger1 = jl.world.makeObstacle({ box: true, x: 15, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 10).to("question_box 1.png", 10), 0, 0, .5, .5);
-        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 200).to("question_box 1.png", 200).to("starburst1.png", 200).to("starburst4.png", 200), 0, 0, .5, .5);
-        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 10).to("question_box 1.png", 10), 0, 0, .5, .5);
-
-        let lc =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-                thisActor.remove(true);
-                jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                    //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#101010", size: 32, z: 0 }, () => "Game Paused");
-                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                        return true;
-                    });
-
-                    overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                        return true;
-                    });
-                    overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 1: 16 ÷ 4 = ?");
-
-                    let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                            score = score + 1;
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "4");
-
-                    let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
-
-                    let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
-
-                    let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "12");
-                });
-                return true;
-        };
-    trigger1.setHeroCollisionCallback(lc);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger1.setCollisionsEnabled(false);
-
-
-    jl.world.makeDestination({ x: 20, y: 2, width: 4.5, height: 5, img: "flag.png" });
-    jl.score.setVictoryDestination(1);
-}
-    
-    //earth
-    if (index == 2) {
-        jl.world.setCameraBounds(160, 9);
-        jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({ x: 0, y: 5, width: 2, height: 6, img: "a1.png" });
-        h.setDefaultAnimation(jl.makeAnimation(25, true, [
-        "a1.png", "a2.png", "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
-        "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
-        "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a28.png", "a29.png", "a30.png", 
-        "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
-        "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
-        //h.setDefaultAnimation(jl.makeAnimation(200, true, ["a1.png", "2.png","3.png","4.png","5.png","6.png",
-        h.disableRotation();
-        h.setPhysics(5, 0, 0.6);
-        h.addVelocity(1, 0);
-        jl.world.setCameraChase(h);
-
-        // set up our background, with a few layers
-        jl.world.setBackgroundColor(0x101010);
-        //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
-        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "earth.png"}, 0);
-        //jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_moon.png"}, 0);
-        //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
-        //jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
-
-
-        //welcomeMessage(jl, "Speed boosters and reducers");
-        //loseMessage(jl, "Try Again");
-
-        
-        jl.world.makeDestination({box: true, x: 8, y: 2, width: 5, height: 8, img: "rocket.png" });
-        jl.score.setVictoryDestination(0);
-
-        
-    }       
-
-    //earth to space
-    if (index == 3) {
-        jl.world.setCameraBounds(16, 70);
-        jl.world.enableTilt(0, 10);
-        jl.world.drawBoundingBox(0, -100, 16, 200, "", 1, 0, 1);
-        let h = jl.world.makeHero({box:true,  x: 5, y: 50, width: 5, height: 8, img: "rocket.png" });
-        jl.world.setCameraChase(h);
-        h.setPhysics(5, 0, 0.6);
-        h.addVelocity(0, -1);
-        h.setMoveByTilting();
-        jl.world.setCameraChase(h);
-
-        // Win by reaching the bottom
-       
-
-        //"teeny_stars.png", "only_big_stars.png", "background_small_stars.png",,
-        // set up vertical scrolling backgrounds
-        jl.world.setBackgroundColor(0xFF00FF);
-        //jl.world.addVerticalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "background_small_stars.png"}, .25);
-        //jl.world.addVerticalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "teeny_stars.png"}, 0);
-        jl.world.addVerticalBackgroundLayer({ x: 0, y: 0, width: 16, height: 45, img: "test.png"}, .25);
-
-        jl.world.makeDestination({ x: 5, y: 3, width: 15, height:5, img: "starburst1.png" });
-        jl.score.setVictoryDestination(1);
-
-        //welcomeMessage(jl, "Vertical scroller demo");
-        //winMessage(jl, "Great Job");
-        //loseMessage(jl, "Try Again");
-    }
-
-    //space shuttle
-    if (index == 4) {
-        jl.world.setCameraBounds(160, 9);
-        jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
-        //let h = jl.world.makeHero({ x: 0, y: 3, width: 2, height: 4, img: "astro_side.png" });
-        //h.setDefaultAnimation(jl.makeAnimation(200, true, ["1.png", "2.png","3.png","4.png","5.png","6.png",]));
-        //h.disableRotation();
-       // h.setPhysics(5, 0, 0.6);
-        //h.addVelocity(1, 0);
-        //jl.world.setCameraChase(h);
-
-        // set up our background, with a few layers
-        //jl.world.setBackgroundColor(0x101010);
-    
-        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "inside_spaceship.png"}, 0);
-        //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
-        //jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
-
-        
-
-        //jl.world.drawPicture({ x: 4.5, y: 1, width: 7, height: 3, img: "", z: -1 });
-
-        //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "space_shuttle_screen.png", z: -1 });
-
-
-        jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-            //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "inside_spaceship.png", z: -1 });
-            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "inside_spaceship.png" }, () => {
-            //jl.world.drawPicture({ x: 4.5, y: 1, width: 7, height: 3, img: "welcome.png", z: -1 });
-            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "lets_learn.png" }, () => {
-            //a11.remove(true);    
-            //a12.remove(true);
-            //a13.remove(true);
-            //a14.remove(true);
-            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "draw_a_picture.png"}, () => {
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "skip_count.png"}, () => {
-                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "add_on.png"}, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-                })
-                return true;
-            })
-            return true;
-            });
-            return true;
-        });
-    });
-            
-        //welcome.hidden(true); 
-
-        //welcomeMessage(jl, "Speed boosters and reducers");
-        //loseMessage("Try Again");
-
-        jl.hud.addTapControl({ x: 7, y: 2, width: 2, height: 1, img: "readybutton.png" }, () => {
-            jl.nav.doLevel(5);
-            return true;
-        });
-
-        
-        // //jl.world.makeDestination({box: true, x: 6, y: 0, width: 5, height: 8, img: "rocket.png" });
-        // jl.score.setVictoryDestination(0);
-        // eleneMessage(jl, "Ready to try it out?");
-        // overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-        //     jl.nav.doLevel(4);
-        // });
-        //jl.nav.doLevel(4)
-    
-    } 
-
-    //lvl1
     if (index == 5) {
         jl.world.setCameraBounds(160, 9);
         jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({ x: 0, y: 5, width: 2, height: 6, img: "a1.png" });
-        h.setDefaultAnimation(jl.makeAnimation(25, true, [
-        "a1.png", "a2.png", "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
+        let h = jl.world.makeHero({ x: 0, y: 2.75, width: 2, height: 5, img: "a1.png", box: true});
+        h.setDefaultAnimation(jl.makeAnimation(30, true, [
+        "a1.png", "a2.png",  "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
         "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
-        "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a28.png", "a29.png", "a30.png", 
+        "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a29.png", "a30.png", 
         "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
         "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
         h.disableRotation();
         h.setPhysics(5, 0, 0.6);
-        h.addVelocity(1, 0);
+        h.addVelocity(.75, 0);
         jl.world.setCameraChase(h);
+
+        let user_id = jl.score.getSessionFact("user_id", "error"); 
+        console.log("user id is " + user_id);
 
         // set up our background, with a few layers
         jl.world.setBackgroundColor(0x101010);
@@ -298,17 +67,16 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
         //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
         jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
 
+        jl.world.drawPicture({ x: 1, y: 1, width: 3.5, height: 1, img: "t_welcome.png"});
+        jl.world.drawPicture({ x: 5.5, y: 1.10, width: 6.5, height: 1, img: "t_2.png"});
+        jl.world.drawPicture({ x: 14, y: 1.10, width: 5.75, height: 2, img: "t_3.png"});
+
 
         //welcomeMessage(jl, "Speed boosters and reducers");
         loseMessage(jl, "Try Again");
 
-        let score = 0;
-
         let trigger1 = jl.world.makeObstacle({ box: true, x: 15, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 10).to("question_box 1.png", 10), 0, 0, .5, .5);
-        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 200).to("question_box 1.png", 200).to("starburst1.png", 200).to("starburst4.png", 200), 0, 0, .5, .5);
-        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 10).to("question_box 1.png", 10), 0, 0, .5, .5);
-
+        
         let lc =
         // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
         // and a new obstacle on the screen.  We'll randomize their placement just a bit.
@@ -317,9 +85,8 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                 thisActor.remove(true);
                 jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
                     //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#101010", size: 32, z: 0 }, () => "Game Paused");
-                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                        return true;
-                    });
+                    overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                    let t4 = overlay.addImage({ x: 11.5, y: 2, width: 4, height: 1, img: "t_4.png" });
 
                     overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
                         return true;
@@ -327,10 +94,12 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                     overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 1: 16 ÷ 4 = ?");
 
                     let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                        overlay.addImage({ x: 5, y: 10, width: 5, height: 1, img: "t_5.png" });
                         a11.remove(true);    
                         a12.remove(true);
                         a13.remove(true);
                         a14.remove(true);
+                        t4.remove(true);
                         overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
                             score = score + 1;
                             jl.nav.dismissOverlayScene();
@@ -345,6 +114,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                         a12.remove(true);
                         a13.remove(true);
                         a14.remove(true);
+                        t4.remove(true);
                         overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
                             jl.nav.dismissOverlayScene();
                             return true;
@@ -358,6 +128,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                         a12.remove(true);
                         a13.remove(true);
                         a14.remove(true);
+                        t4.remove(true);
                         overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
                             jl.nav.dismissOverlayScene();
                             return true;
@@ -371,6 +142,7 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
                         a12.remove(true);
                         a13.remove(true);
                         a14.remove(true);
+                        t4.remove(true);
                         overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
                             jl.nav.dismissOverlayScene();
                             return true;
@@ -385,582 +157,790 @@ export function buildLevelScreen(index: number, jl: JetLagApi): void {
     // No transfer of momeuntum when the hero collides with the trigger
     trigger1.setCollisionsEnabled(false);
 
-    let trigger2 = jl.world.makeObstacle({ box: true, x: 30, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+    jl.world.drawPicture({ x: 23, y: 1.10, width: 7, height: 2, img: "t_6.png"});
+    jl.world.makeDestination({ x: 30, y: 2, width: 4.5, height: 5, img: "flag.png" });
+    jl.score.setVictoryDestination(1);
+
+    }
+
+        //earth
+    if (index == 2) {
+            jl.world.setCameraBounds(160, 9);
+            jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
+            let h = jl.world.makeHero({ x: 0, y: 2.75, width: 2, height: 5, img: "a1.png", box: true});
+            h.setDefaultAnimation(jl.makeAnimation(25, true, [
+            "a1.png", "a2.png",  "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
+            "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
+            "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a29.png", "a30.png", 
+            "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
+            "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
+            //h.setDefaultAnimation(jl.makeAnimation(200, true, ["a1.png", "2.png","3.png","4.png","5.png","6.png",
+            h.disableRotation();
+            h.setPhysics(5, 0, 0.6);
+            h.addVelocity(1, 0);
+            jl.world.setCameraChase(h);
     
-        let lc2 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-            thisActor.remove(true);
-            // ask javascript what time it is 
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 2: 32 ÷ 4 = ?");
+            // set up our background, with a few layers
+            jl.world.setBackgroundColor(0x101010);
+            jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "earth.png"}, 0);
+
             
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "9");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        //ask javascript for stop time - performance.now()
-                        //compute difference
-                        //send to server
-                        // POST for record
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "14");
-            });
-            return true;
-    };
-    trigger2.setHeroCollisionCallback(lc2);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger2.setCollisionsEnabled(false);
-
-
-    let trigger3 = jl.world.makeObstacle({ box: true, x: 45, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+            jl.world.makeDestination({box: true, x: 5, y: .75, width: 5, height: 8, img: "rocket.png" });
+            jl.score.setVictoryDestination(0);
     
-    let lc3 =
-    // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-    // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-    // Also move the obstacle forward, so we can hit it again.
-    (thisActor: Obstacle, collideActor: Hero) => {
-        thisActor.remove(true);
-        jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-            //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                return true;
-            });
             
-            overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                return true;
-            });
-            overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 3: 12 ÷ 6 = ?");
+    }       
+    
+        //earth to space
+    if (index == 3) {
+            jl.world.setCameraBounds(16, 70);
+            jl.world.enableTilt(0, 10);
+            jl.world.drawBoundingBox(0, -100, 16, 200, "", 1, 0, 1);
+            let h = jl.world.makeHero({box:true,  x: 5, y: 50, width: 5, height: 8, img: "rocket.png" });
+            jl.world.setCameraChase(h);
+            h.setPhysics(5, 0, 0.6);
+            h.addVelocity(0, -1);
+            h.setMoveByTilting();
+            jl.world.setCameraChase(h);
+    
+            jl.world.setBackgroundColor(0xFF00FF);
+
+            jl.world.addVerticalBackgroundLayer({ x: 0, y: 0, width: 16, height: 45, img: "test.png"}, .25);
+    
+            jl.world.makeDestination({ x: 5, y: 3, width: 15, height:5, img: "starburst1.png" });
+            jl.score.setVictoryDestination(1);
+    }
+    
+        //space shuttle
+    if (index == 4) {
+            jl.world.setCameraBounds(160, 9);
+            jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
         
-            let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                a11.remove(true);    
-                a12.remove(true);
-                a13.remove(true);
-                a14.remove(true);
-                overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                    jl.nav.dismissOverlayScene();
-                    return true;
-                })
-                return true;
-           });
-            overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "3");
+        
+            jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "inside_spaceship.png"}, 0);
+    
+    
+            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
 
-            let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                a11.remove(true);    
-                a12.remove(true);
-                a13.remove(true);
-                a14.remove(true);
-                overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                    jl.nav.dismissOverlayScene();
-                    return true;
-                })
-                return true;
-           });
-            overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "4");
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "inside_spaceship.png" }, () => {
 
-            let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                a11.remove(true);    
-                a12.remove(true);
-                a13.remove(true);
-                a14.remove(true);
-                overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                    score = score + 1;
-                    jl.nav.dismissOverlayScene();
-                    return true;
-                })
-                return true;
-           });
-            overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "2");
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "lets_learn.png" }, () => {
 
-            let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                a11.remove(true);    
-                a12.remove(true);
-                a13.remove(true);
-                a14.remove(true);
-                overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                    jl.nav.dismissOverlayScene();
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "draw_a_picture.png"}, () => {
+                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "skip_count.png"}, () => {
+                        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "add_on.png"}, () => {
+                            jl.nav.dismissOverlayScene();
+                            return true;
+                        })
+                        return true;
+                    })
                     return true;
                 })
                 return true;
-           });
-            overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
-            console.log(score);
+                });
+                return true;
+            });
         });
-        return true;
-};
-trigger3.setHeroCollisionCallback(lc3);
-// No transfer of momeuntum when the hero collides with the trigger
-trigger3.setCollisionsEnabled(false);
-
-
-let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+                
+            //welcome.hidden(true); 
     
-        let lc4 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
+            //welcomeMessage(jl, "Speed boosters and reducers");
+            //loseMessage("Try Again");
+    
+            jl.hud.addTapControl({ x: 7, y: 2, width: 2, height: 1, img: "readybutton.png" }, () => {
+                jl.nav.doLevel(5);
+                return true;
+            });
+    
+            
+            // //jl.world.makeDestination({box: true, x: 6, y: 0, width: 5, height: 8, img: "rocket.png" });
+            // jl.score.setVictoryDestination(0);
+            // eleneMessage(jl, "Ready to try it out?");
+            // overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
+            //     jl.nav.doLevel(4);
+            // });
+            //jl.nav.doLevel(4)
+        
+    } 
+
+    //lvl1 ~ was 5
+    if (index == 1) {
+        game_start = new Date().getTime();
+        jl.world.setCameraBounds(160, 9);
+        jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
+        let h = jl.world.makeHero({ x: 0, y: 2.75, width: 2, height: 5, img: "a1.png", box: true});
+        h.setDefaultAnimation(jl.makeAnimation(25, true, [
+        "a1.png", "a2.png",  "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
+        "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
+        "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a29.png", "a30.png", 
+        "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
+        "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
+        h.disableRotation();
+        h.setPhysics(5, 0, 0.6);
+        h.addVelocity(1, 0);
+        jl.world.setCameraChase(h);
+
+        // set up our background, with a few layers
+        jl.world.setBackgroundColor(0x101010);
+        //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_moon.png"}, 0);
+        //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
+        jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
+
+        let q_responses: any[] = [];
+
+        interface Question_Set {
+            id: string
+            question: string
+            optionOne: string
+            optionTwo: string
+            optionThree: string
+            optionFour: string
+            answer: string
+            questionSetId: string
+        }
+
+        let set_id = jl.score.getSessionFact("set_id", "error"); 
+        let url = "http://localhost:8080/api/questions/sets/" + set_id;
+
+        function getQuestion_Set(): Promise<Question_Set[]> {
+            return fetch(url)
+                .then(res => res.json())
+                .then(res => {
+                    return res as Question_Set[]
+                })
+         }
+
+         //let result = document.getElementById('result')
+        getQuestion_Set()
+            .then(question_set => {
+
+                let trigger1 = jl.world.makeObstacle({ box: true, x: 15, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+                
+                let lc =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                        let q1_start = new Date().getTime();
+                        thisActor.remove(true);
+                        jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                            overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+        
+                            overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                                return true;
+                            });
+                            overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[0].question.toString());
+
+                            var an_entry: array_entry = {
+                            //let an_entry: array_entry {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                            let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                let q_id = question_set[0].id.toString();
+                                let q1_end = new Date().getTime();
+                                console.log("The question id in a11 is " + q_id);
+                                checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[0].optionOne.toString(), 
+                                question_set[0].answer.toString(), q_responses, an_entry, q1_start, q1_end);
+                                flag = true;
+                                return true;
+
+                           });
+                            overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[0].optionOne.toString());
+        
+                            let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                let q1_end = new Date().getTime();
+                                let q_id = question_set[0].id.toString();
+                                checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[0].optionTwo.toString(), 
+                                question_set[0].answer.toString(), q_responses, an_entry, q1_start, q1_end);
+                                return true;
+                           });
+                            overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[0].optionTwo.toString());
+        
+                            let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                let q1_end = new Date().getTime();
+                                let q_id = question_set[0].id.toString();
+                                checkAnswer(jl, overlay,q_id, a11, a12, a13, a14, question_set[0].optionThree.toString(), question_set[0].answer.toString(), 
+                                q_responses, an_entry, q1_start, q1_end);
+                                return true;
+
+                           });
+                            overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[0].optionThree.toString());
+        
+                            let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                let q1_end = new Date().getTime();
+                                let q_id = question_set[0].id.toString();
+                                checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[0].optionFour.toString(), 
+                                question_set[0].answer.toString(), q_responses, an_entry, q1_start, q1_end);
+                                console.log("the array is " + q_responses)
+                                return true;
+                           });
+                            overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[0].optionFour.toString());
+            
+                            overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                                let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                    hint_bar_1.remove(true);
+                                    return true;
+                                })
+                                return true;
+                            });
+                        return true;
+                    });
+                };
+                trigger1.setHeroCollisionCallback(lc);
+                trigger1.setCollisionsEnabled(false);
+
+                let trigger2 = jl.world.makeObstacle({ box: true, x: 30, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+    
+                let lc2 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q2_start = new Date().getTime();
+                    thisActor.remove(true);
+                    // ask javascript what time it is 
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                                    overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                                        return true;
+                                    });
+                                    overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[1].question.toString());
+
+                                    var an_entry: array_entry = {
+                                            questionId: 0,
+                                            correct: 0,
+                                            time: 0,
+                                            picked: 0,
+            
+                                        };
+
+                                    let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                        let q_id = question_set[1].id.toString();
+                                        let q2_end = new Date().getTime();
+                                        checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[1].optionOne.toString(), 
+                                        question_set[1].answer.toString(), q_responses, an_entry, q2_start, q2_end);
+                                        return true;
+
+                                });
+                                    overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[1].optionOne.toString());
+                
+                                    let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                        let q_id = question_set[1].id.toString();
+                                        let q2_end = new Date().getTime();
+                                        checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[1].optionTwo.toString(), 
+                                        question_set[1].answer.toString(), q_responses, an_entry, q2_start, q2_end);
+                                        return true;
+                                });
+                                    overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[1].optionTwo.toString());
+                
+                                    let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                        let q_id = question_set[1].id.toString();
+                                        let q2_end = new Date().getTime();
+                                        checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[1].optionThree.toString(), 
+                                        question_set[1].answer.toString(), q_responses, an_entry, q2_start, q2_end);
+                                        return true;
+                                });
+                                    overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[1].optionThree.toString());
+                
+                                    let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                        let q_id = question_set[1].id.toString();
+                                        let q2_end = new Date().getTime();
+                                        checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[1].optionFour.toString(), 
+                                        question_set[1].answer.toString(), q_responses, an_entry, q2_start, q2_end);
+                                        return true;
+                                });
+                                    overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[1].optionFour.toString());
+
+                                    overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                                        let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                            hint_bar_1.remove(true);
+                                            return true;
+                                            })
+                                        return true;
+                                    });
+                        });
+                return true;
+                };
+
+                trigger2.setHeroCollisionCallback(lc2);
+                trigger2.setCollisionsEnabled(false);
+
+                let trigger3 = jl.world.makeObstacle({ box: true, x: 45, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+                
+                let lc3 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q3_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            return true;
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[2].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[2].id.toString();
+                            let q3_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[2].optionOne.toString(), 
+                            question_set[2].answer.toString(), q_responses, an_entry, q3_start, q3_end);
+                            return true;
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[2].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[2].id.toString();
+                            let q3_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[2].optionTwo.toString(), 
+                            question_set[2].answer.toString(), q_responses, an_entry, q3_start, q3_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[2].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[2].id.toString();
+                            let q3_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[2].optionThree.toString(), 
+                            question_set[2].answer.toString(), q_responses, an_entry, q3_start, q3_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[2].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[2].id.toString();
+                            let q3_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[2].optionFour.toString(), 
+                            question_set[2].answer.toString(), q_responses, an_entry, q3_start, q3_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[2].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                        });
+                    return true;
+                };
+
+                trigger3.setHeroCollisionCallback(lc3);
+                trigger3.setCollisionsEnabled(false);
+
+
+                let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+                
+                let lc4 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q4_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            return true;
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[3].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[3].id.toString();
+                            let q4_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[3].optionOne.toString(), 
+                            question_set[3].answer.toString(), q_responses, an_entry, q4_start, q4_end);
+                            return true;
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[3].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[3].id.toString();
+                            let q4_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[3].optionTwo.toString(), 
+                            question_set[3].answer.toString(), q_responses, an_entry, q4_start, q4_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[3].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[3].id.toString();
+                            let q4_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[3].optionThree.toString(), 
+                            question_set[3].answer.toString(), q_responses, an_entry, q4_start, q4_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[3].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[3].id.toString();
+                            let q4_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[3].optionFour.toString(), 
+                            question_set[3].answer.toString(), q_responses, an_entry, q4_start, q4_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[3].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                    });
+                return true;
+                };
+
+                trigger4.setHeroCollisionCallback(lc4);
+                trigger4.setCollisionsEnabled(false);
+
+                let trigger5 = jl.world.makeObstacle({ box: true, x: 75, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+            
+                let lc5 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q5_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            return true;
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[4].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[4].id.toString();
+                            let q5_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[4].optionOne.toString(), 
+                            question_set[4].answer.toString(), q_responses, an_entry, q5_start, q5_end);
+                            return true;
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[4].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[4].id.toString();
+                            let q5_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[4].optionTwo.toString(), 
+                            question_set[4].answer.toString(), q_responses, an_entry, q5_start, q5_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[4].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[4].id.toString();
+                            let q5_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[4].optionThree.toString(), 
+                            question_set[4].answer.toString(), q_responses, an_entry, q5_start, q5_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[4].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[4].id.toString();
+                            let q5_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[4].optionFour.toString(), 
+                            question_set[4].answer.toString(), q_responses, an_entry, q5_start, q5_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[4].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                    });
+                return true;
+                };
+
+                trigger5.setHeroCollisionCallback(lc5);
+                trigger5.setCollisionsEnabled(false);
+
+                let trigger6 = jl.world.makeObstacle({ box: true, x: 90, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+    
+                let lc6 =
+                
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q6_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            return true;
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[5].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[5].id.toString();
+                            let q6_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[5].optionOne.toString(), 
+                            question_set[5].answer.toString(), q_responses, an_entry, q6_start, q6_end);
+                            return true;
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[5].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[5].id.toString();
+                            let q6_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[5].optionTwo.toString(), 
+                            question_set[5].answer.toString(), q_responses, an_entry, q6_start, q6_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[5].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[5].id.toString();
+                            let q6_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[5].optionThree.toString(), 
+                            question_set[5].answer.toString(), q_responses, an_entry, q6_start, q6_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[5].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[5].id.toString();
+                            let q6_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[5].optionFour.toString(), 
+                            question_set[5].answer.toString(), q_responses, an_entry, q6_start, q6_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[5].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                    });
+                return true;
+                };
+
+                trigger6.setHeroCollisionCallback(lc6);
+                trigger6.setCollisionsEnabled(false);
+
+                let trigger7 = jl.world.makeObstacle({ box: true, x: 105, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+    
+                let lc7 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q7_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            return true;
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[6].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[6].id.toString();
+                            let q7_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[6].optionOne.toString(), 
+                            question_set[6].answer.toString(), q_responses, an_entry, q7_start, q7_end);
+                            return true;
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[6].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[6].id.toString();
+                            let q7_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[6].optionTwo.toString(), 
+                            question_set[6].answer.toString(), q_responses, an_entry, q7_start, q7_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[6].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[6].id.toString();
+                            let q7_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[6].optionThree.toString(), 
+                            question_set[6].answer.toString(), q_responses, an_entry, q7_start, q7_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[6].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[6].id.toString();
+                            let q7_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[6].optionFour.toString(), 
+                            question_set[6].answer.toString(), q_responses, an_entry, q7_start, q7_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[6].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                    });
+                return true;
+                };
+
+                trigger7.setHeroCollisionCallback(lc7);
+                trigger7.setCollisionsEnabled(false);
+
+                let trigger8 = jl.world.makeObstacle({ box: true, x: 120, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+    
+                let lc8 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q8_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            return true;
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[7].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[7].id.toString();
+                            let q8_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionOne.toString(), 
+                            question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+                            postAttempts(user_id, q_responses)
+                            return true;
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[7].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[7].id.toString();
+                            let q8_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionTwo.toString(), 
+                            question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+                            postAttempts(user_id, q_responses);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[7].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[7].id.toString();
+                            let q8_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionThree.toString(), 
+                            question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+                            postAttempts(user_id, q_responses);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[7].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[7].id.toString();
+                            let q8_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionFour.toString(), 
+                            question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+                            postAttempts(user_id, q_responses);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[7].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                    });
+                return true;
+                };
+
+                trigger8.setHeroCollisionCallback(lc8);
+                trigger8.setCollisionsEnabled(false);
+                    
+    })
+
+    let user_id = jl.score.getSessionFact("user_id", "error"); 
+
+    console.log("the flag is " + flag);
+
+    let trigger1000 = jl.world.makeObstacle({ box: true, x: 125, y: 5.50, width: 3, height: 2, img: "" });
+        let lc2 =
         (thisActor: Obstacle, collideActor: Hero) => {
             thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 4: 36 ÷ 9 = ?");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "6");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "5");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "4");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "3");
-                console.log(score);
-            });
+            game_end = new Date().getTime();
+            console.log("end time is " + game_end)
             return true;
-    };
-    trigger4.setHeroCollisionCallback(lc4);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger4.setCollisionsEnabled(false);
+        };
 
+        trigger1000.setHeroCollisionCallback(lc2);
+        trigger1000.setCollisionsEnabled(false);
 
-    let trigger5 = jl.world.makeObstacle({ box: true, x: 75, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-    
-        let lc5 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-            thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 5: 81 ÷ 9  = ?");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "6");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "9");
-            });
-            return true;
-    };
-    trigger5.setHeroCollisionCallback(lc5);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger5.setCollisionsEnabled(false);
-
-
-    let trigger6 = jl.world.makeObstacle({ box: true, x: 90, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-    
-        let lc6 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-            thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 6: 48 ÷ 6 = ?");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "5");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
-            });
-            return true;
-    };
-    trigger6.setHeroCollisionCallback(lc6);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger6.setCollisionsEnabled(false);
-
-
-    let trigger7 = jl.world.makeObstacle({ box: true, x: 105, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-    
-        let lc7 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-            thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 7: 35 ÷ 5 = ?");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "6");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "9");
-            });
-            return true;
-    };
-    trigger7.setHeroCollisionCallback(lc7);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger7.setCollisionsEnabled(false);
-
-
-    let trigger8 = jl.world.makeObstacle({ box: true, x: 120, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-    
-        let lc8 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-            thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 8: 56 ÷ 7 = ?");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        winMessage(jl, score);
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "6");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        winMessage(jl, score);
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        winMessage(jl, score);
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "9");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        winMessage(jl, score);
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
-            });
-            return true;
-    };
-    trigger8.setHeroCollisionCallback(lc8);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger8.setCollisionsEnabled(false);
-
-    jl.world.makeDestination({ x: 125, y: 2, width: 4.5, height: 5, img: "flag.png" });
+    jl.world.makeDestination({ x: 126, y: 2, width: 4.5, height: 5, img: "flag.png" });
     jl.score.setVictoryDestination(1);
     }
 
-    //lvl2
     else if (index == 6) {
+        game_start = new Date().getTime();
         jl.world.setCameraBounds(160, 9);
         jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
-        let h = jl.world.makeHero({ x: 0, y: 5, width: 2, height: 6, img: "a1.png" });
+        let h = jl.world.makeHero({ x: 0, y: 2.75, width: 2, height: 5, img: "a1.png", box: true});
         h.setDefaultAnimation(jl.makeAnimation(25, true, [
-        "a1.png", "a2.png", "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
+        "a1.png", "a2.png",  "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
         "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
-        "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a28.png", "a29.png", "a30.png", 
+        "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a29.png", "a30.png", 
         "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
         "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
         h.disableRotation();
@@ -977,1350 +957,736 @@ let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, heig
         //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
         jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
 
-        // // place a speed-up obstacle that lasts for 2 seconds
-        // let o1 = jl.world.makeObstacle({ x: 20, y: 0, width: 1, height: 1, img: "rightarrow.png" });
-        // o1.setSpeedBoost(5, 0, 2);
-        // // place a slow-down obstacle that lasts for 3 seconds
-        // let o2 = jl.world.makeObstacle({ x: 60, y: 0, width: 1, height: 1, img: "leftarrow.png" });
-        // o2.setSpeedBoost(-2, 0, 3);
-        // // place a permanent +3 speedup obstacle... the -1 means "forever"
-        // let o3 = jl.world.makeObstacle({ x: 80, y: 0, width: 1, height: 1, img: "purpleball.png" });
-        // o3.setSpeedBoost(3, 0, -1);
+        let q_responses: any[] = [];
 
-        //welcomeMessage(jl, "Speed boosters and reducers");
-        //winMessage(jl, "Great Job");
-        loseMessage(jl, "Try Again");
+        interface Question_Set {
+            id: string
+            question: string
+            optionOne: string
+            optionTwo: string
+            optionThree: string
+            optionFour: string
+            answer: string
+            questionSetId: string
+        }
 
-        let score = 0;
+        let set_id = jl.score.getSessionFact("set_id", "error"); 
+        let url = "http://localhost:8080/api/questions/sets/" + set_id;
 
-        let trigger1 = jl.world.makeObstacle({ box: true, x: 15, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 10).to("question_box 1.png", 10), 0, 0, .5, .5);
-        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 200).to("question_box 1.png", 200).to("starburst1.png", 200).to("starburst4.png", 200), 0, 0, .5, .5);
-        //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 10).to("question_box 1.png", 10), 0, 0, .5, .5);
+        function getQuestion_Set(): Promise<Question_Set[]> {
+            return fetch(url)
+                .then(res => res.json())
+                .then(res => {
+                    return res as Question_Set[]
+                })
+         }
 
-        let lc =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-                thisActor.remove(true);
-                jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                    //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                        return true;
-                    });
-                    
-                    overlay.addTapControl({ x: 4, y: .75, width: 8, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                        return true;
-                    });
-                    overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 9: 30 divided into groups of 5");
+         //let result = document.getElementById('result')
+        getQuestion_Set()
+            .then(question_set => {
+
+                let trigger1 = jl.world.makeObstacle({ box: true, x: 15, y: 5.50, width: 3, height: 2, img: "question_box.png" });
                 
-                    let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "4");
-
-                    let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                            score = score + 1;
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
-
-                    let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "5");
-
-                    let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
-                });
-                return true;
-        };
-    trigger1.setHeroCollisionCallback(lc);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger1.setCollisionsEnabled(false);
-
-    let trigger2 = jl.world.makeObstacle({ box: true, x: 30, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-    
-        let lc2 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-            thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({  x: 4, y: .75, width: 8, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 10: 24 divided into groups of 4");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "7");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "5");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
-            });
-            return true;
-    };
-    trigger2.setHeroCollisionCallback(lc2);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger2.setCollisionsEnabled(false);
-
-
-    let trigger3 = jl.world.makeObstacle({ box: true, x: 45, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-    
-    let lc3 =
-    // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-    // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-    // Also move the obstacle forward, so we can hit it again.
-    (thisActor: Obstacle, collideActor: Hero) => {
-        thisActor.remove(true);
-        jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-            //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                return true;
-            });
-            
-            overlay.addTapControl({  x: 4, y: .75, width: 8, height: 2, img: "question_bar.png"  }, (eventPositionX: number, eventPositionY: number) => {
-                return true;
-            });
-            overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 11: 10 divided into groups of 5");
+                let lc =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                        let q1_start = new Date().getTime();
+                        thisActor.remove(true);
+                        jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                            overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
         
-            let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                a11.remove(true);    
-                a12.remove(true);
-                a13.remove(true);
-                a14.remove(true);
-                overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                    jl.nav.dismissOverlayScene();
-                    return true;
-                })
+                            overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                                return true;
+                            });
+                            overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[8].question.toString());
+
+                            var an_entry: array_entry = {
+                            //let an_entry: array_entry {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                            let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                let q_id = question_set[8].id.toString();
+                                let q1_end = new Date().getTime();
+                                console.log("The question id in a11 is " + q_id);
+                                checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[8].optionOne.toString(), 
+                                question_set[8].answer.toString(), q_responses, an_entry, q1_start, q1_end);
+                                flag = true;
+                                return true;
+
+                           });
+                            overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[8].optionOne.toString());
+        
+                            let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                let q1_end = new Date().getTime();
+                                let q_id = question_set[8].id.toString();
+                                checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[8].optionTwo.toString(), 
+                                question_set[8].answer.toString(), q_responses, an_entry, q1_start, q1_end);
+                                return true;
+                           });
+                            overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[8].optionTwo.toString());
+        
+                            let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                let q1_end = new Date().getTime();
+                                let q_id = question_set[8].id.toString();
+                                checkAnswer(jl, overlay,q_id, a11, a12, a13, a14, question_set[8].optionThree.toString(), question_set[8].answer.toString(), 
+                                q_responses, an_entry, q1_start, q1_end);
+                                return true;
+
+                           });
+                            overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[8].optionThree.toString());
+        
+                            let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                let q1_end = new Date().getTime();
+                                let q_id = question_set[8].id.toString();
+                                checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[8].optionFour.toString(), 
+                                question_set[8].answer.toString(), q_responses, an_entry, q1_start, q1_end);
+                                console.log("the array is " + q_responses)
+                                return true;
+                           });
+                            overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[8].optionFour.toString());
+            
+                            overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                                let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                    hint_bar_1.remove(true);
+                                    return true;
+                                })
+                                return true;
+                            });
+                        return true;
+                    });
+                };
+                trigger1.setHeroCollisionCallback(lc);
+                trigger1.setCollisionsEnabled(false);
+
+                let trigger2 = jl.world.makeObstacle({ box: true, x: 30, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+    
+                let lc2 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q2_start = new Date().getTime();
+                    thisActor.remove(true);
+                    // ask javascript what time it is 
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                                    overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                                        return true;
+                                    });
+                                    overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[9].question.toString());
+
+                                    var an_entry: array_entry = {
+                                            questionId: 0,
+                                            correct: 0,
+                                            time: 0,
+                                            picked: 0,
+            
+                                        };
+
+                                    let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                        let q_id = question_set[9].id.toString();
+                                        let q2_end = new Date().getTime();
+                                        checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[9].optionOne.toString(), 
+                                        question_set[9].answer.toString(), q_responses, an_entry, q2_start, q2_end);
+                                        return true;
+
+                                });
+                                    overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[9].optionOne.toString());
+                
+                                    let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                        let q_id = question_set[9].id.toString();
+                                        let q2_end = new Date().getTime();
+                                        checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[9].optionTwo.toString(), 
+                                        question_set[9].answer.toString(), q_responses, an_entry, q2_start, q2_end);
+                                        return true;
+                                });
+                                    overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[9].optionTwo.toString());
+                
+                                    let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                        let q_id = question_set[9].id.toString();
+                                        let q2_end = new Date().getTime();
+                                        checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[9].optionThree.toString(), 
+                                        question_set[9].answer.toString(), q_responses, an_entry, q2_start, q2_end);
+                                        return true;
+                                });
+                                    overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[9].optionThree.toString());
+                
+                                    let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                                        let q_id = question_set[9].id.toString();
+                                        let q2_end = new Date().getTime();
+                                        checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[9].optionFour.toString(), 
+                                        question_set[9].answer.toString(), q_responses, an_entry, q2_start, q2_end);
+                                        return true;
+                                });
+                                    overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[9].optionFour.toString());
+
+                                    overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                                        let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                            hint_bar_1.remove(true);
+                                            return true;
+                                            })
+                                        return true;
+                                    });
+                        });
                 return true;
-           });
-            overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "5");
+                };
 
-            let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                a11.remove(true);    
-                a12.remove(true);
-                a13.remove(true);
-                a14.remove(true);
-                overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                    jl.nav.dismissOverlayScene();
-                    return true;
-                })
-                return true;
-           });
-            overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "4");
+                trigger2.setHeroCollisionCallback(lc2);
+                trigger2.setCollisionsEnabled(false);
 
-            let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                a11.remove(true);    
-                a12.remove(true);
-                a13.remove(true);
-                a14.remove(true);
-                overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                    jl.nav.dismissOverlayScene();
-                    return true;
-                })
-                return true;
-           });
-            overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "3");
-
-            let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                a11.remove(true);    
-                a12.remove(true);
-                a13.remove(true);
-                a14.remove(true);
-                overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                    score = score + 1;
-                    jl.nav.dismissOverlayScene();
-                    return true;
-                })
-                return true;
-           });
-            overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "2");
-        });
-        return true;
-};
-trigger3.setHeroCollisionCallback(lc3);
-// No transfer of momeuntum when the hero collides with the trigger
-trigger3.setCollisionsEnabled(false);
-
-
-let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-    
-        let lc4 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-            thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
+                let trigger3 = jl.world.makeObstacle({ box: true, x: 45, y: 5.50, width: 3, height: 2, img: "question_box.png" });
                 
-                overlay.addTapControl({  x: 4, y: .75, width: 8, height: 2, img: "question_bar.png"  }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 12: 18 divided into groups of 9");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "1");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "2");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "3");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "4");
-            });
-            return true;
-    };
-    trigger4.setHeroCollisionCallback(lc4);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger4.setCollisionsEnabled(false);
-
-
-    let trigger5 = jl.world.makeObstacle({ box: true, x: 75, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-    
-        let lc5 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-            thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({  x: 4, y: .75, width: 8, height: 2, img: "question_bar.png"  }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 13: 15 divided into groups of 5");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "7");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "5");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "3");
-            });
-            return true;
-    };
-    trigger5.setHeroCollisionCallback(lc5);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger5.setCollisionsEnabled(false);
-
-
-    let trigger6 = jl.world.makeObstacle({ box: true, x: 90, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-    
-        let lc6 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-            thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({  x: 4, y: .75, width: 8, height: 2, img: "question_bar.png"  }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 14: 27 divided into groups of 3");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "5");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "9");
-            });
-            return true;
-    };
-    trigger6.setHeroCollisionCallback(lc6);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger6.setCollisionsEnabled(false);
-
-
-    let trigger7 = jl.world.makeObstacle({ box: true, x: 105, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-    
-        let lc7 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-            thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({  x: 4, y: .75, width: 8, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 15: 72 divided into groups of 8");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "9");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
-            });
-            return true;
-    };
-    trigger7.setHeroCollisionCallback(lc7);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger7.setCollisionsEnabled(false);
-
-
-    let trigger8 = jl.world.makeObstacle({ box: true, x: 120, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-    
-        let lc8 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
-        (thisActor: Obstacle, collideActor: Hero) => {
-            thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({  x: 4, y: .75, width: 8, height: 2, img: "question_bar.png"  }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 16: 64 divided into groups of 8");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        winMessage(jl, score);
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "8");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        winMessage(jl, score);
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        winMessage(jl, score);
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "9");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        winMessage(jl, score);
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "2");
-
-            });
-            return true;
-    };
-    trigger8.setHeroCollisionCallback(lc8);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger8.setCollisionsEnabled(false);
-
-    jl.world.makeDestination({ x: 125, y: 2, width: 4.5, height: 5, img: "flag.png" });
-    jl.score.setVictoryDestination(1);
-}
-
-    // lvl3
-    else if (index == 7) {
-            jl.world.setCameraBounds(160, 9);
-            jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
-            let h = jl.world.makeHero({ x: 0, y: 5, width: 2, height: 6, img: "a1.png" });
-            h.setDefaultAnimation(jl.makeAnimation(25, true, [
-            "a1.png", "a2.png", "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
-            "a11.png", "a12.png", "a13.png", "a14.png", "a15.png", "a16.png", "a17.png", "a18.png", "a19.png", "a20.png", 
-            "a21.png", "a22.png", "a23.png", "a24.png", "a25.png", "a26.png", "a27.png", "a28.png", "a29.png", "a30.png", 
-            "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
-            "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png", ]));
-            h.disableRotation();
-            h.setPhysics(5, 0, 0.6);
-            h.addVelocity(1, 0);
-            jl.world.setCameraChase(h);
-            jl.world.makeDestination({ x: 159, y: 0, width: 1, height: 1, img: "mustardball.png" });
-            jl.score.setVictoryDestination(1);
-
-            // set up our background, with a few layers
-            jl.world.setBackgroundColor(0x101010);
-            //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "lvl1_background.png", z: -1 });
-            jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "lvl3_moon.png"}, 0);
-            //jl.world.addHorizontalForegroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "mid.png" }, 0);
-            jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 6, img: "lvl1_stars.png" }, 0.5);
-
-            // // place a speed-up obstacle that lasts for 2 seconds
-            // let o1 = jl.world.makeObstacle({ x: 20, y: 0, width: 1, height: 1, img: "rightarrow.png" });
-            // o1.setSpeedBoost(5, 0, 2);
-            // // place a slow-down obstacle that lasts for 3 seconds
-            // let o2 = jl.world.makeObstacle({ x: 60, y: 0, width: 1, height: 1, img: "leftarrow.png" });
-            // o2.setSpeedBoost(-2, 0, 3);
-            // // place a permanent +3 speedup obstacle... the -1 means "forever"
-            // let o3 = jl.world.makeObstacle({ x: 80, y: 0, width: 1, height: 1, img: "purpleball.png" });
-            // o3.setSpeedBoost(3, 0, -1);
-    
-            //welcomeMessage(jl, "Speed boosters and reducers");
-            //winMessage(jl, "Great Job");
-            loseMessage(jl, "Try Again");
-
-            let score = 0;
-
-            let trigger1 = jl.world.makeObstacle({ box: true, x: 15, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-            //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 10).to("question_box 1.png", 10), 0, 0, .5, .5);
-            //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 200).to("question_box 1.png", 200).to("starburst1.png", 200).to("starburst4.png", 200), 0, 0, .5, .5);
-            //trigger1.setDisappearAnimation(jl.makeComplexAnimation(false).to("question_box.png", 10).to("question_box 1.png", 10), 0, 0, .5, .5);
-
-            let lc =
-            // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-            // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-            // Also move the obstacle forward, so we can hit it again.
-            (thisActor: Obstacle, collideActor: Hero) => {
+                let lc3 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q3_start = new Date().getTime();
                     thisActor.remove(true);
                     jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                        //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
                             return true;
                         });
-                        
-                        overlay.addTapControl({ x: 2, y: .25, width: 12, height: 3, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                            return true;
-                        });
-                        //welcomeMessage(jl, "Reach the destination\nto win this level");
-                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 35, z: 0 }, () => "Question 17: I bought a bag of fruit candies at the store.\nThere were 55 candies in the bag. I want to share with 5 friends.\nHow many will each friend get?");
-                    
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[10].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
                         let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                            a11.remove(true);    
-                            a12.remove(true);
-                            a13.remove(true);
-                            a14.remove(true);
-                            overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                                jl.nav.dismissOverlayScene();
-                                return true;
-                            })
+                            let q_id = question_set[10].id.toString();
+                            let q3_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[10].optionOne.toString(), 
+                            question_set[10].answer.toString(), q_responses, an_entry, q3_start, q3_end);
                             return true;
-                       });
-                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "10");
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[10].optionOne.toString());
 
                         let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                            a11.remove(true);    
-                            a12.remove(true);
-                            a13.remove(true);
-                            a14.remove(true);
-                            overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                                jl.nav.dismissOverlayScene();
-                                return true;
-                            })
+                            let q_id = question_set[10].id.toString();
+                            let q3_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[10].optionTwo.toString(), 
+                            question_set[10].answer.toString(), q_responses, an_entry, q3_start, q3_end);
                             return true;
-                       });
-                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "9");
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[10].optionTwo.toString());
 
                         let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                            a11.remove(true);    
-                            a12.remove(true);
-                            a13.remove(true);
-                            a14.remove(true);
-                            overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                                jl.nav.dismissOverlayScene();
-                                return true;
-                            })
+                            let q_id = question_set[10].id.toString();
+                            let q3_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[10].optionThree.toString(), 
+                            question_set[10].answer.toString(), q_responses, an_entry, q3_start, q3_end);
                             return true;
-                       });
-                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "12");
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[10].optionThree.toString());
 
                         let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                            a11.remove(true);    
-                            a12.remove(true);
-                            a13.remove(true);
-                            a14.remove(true);
-                            overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                                score = score + 1;
-                                jl.nav.dismissOverlayScene();
+                            let q_id = question_set[10].id.toString();
+                            let q3_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[10].optionFour.toString(), 
+                            question_set[10].answer.toString(), q_responses, an_entry, q3_start, q3_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[10].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
                                 return true;
-                            })
+                                })
                             return true;
-                       });
-                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "11");
-                    });
+                        });
+                        });
                     return true;
-            };
-        trigger1.setHeroCollisionCallback(lc);
-        // No transfer of momeuntum when the hero collides with the trigger
-        trigger1.setCollisionsEnabled(false);
+                };
 
-        let trigger2 = jl.world.makeObstacle({ box: true, x: 30, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-        
-            let lc2 =
-            // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-            // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-            // Also move the obstacle forward, so we can hit it again.
-            (thisActor: Obstacle, collideActor: Hero) => {
-                thisActor.remove(true);
-                jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                    //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                        return true;
-                    });
-                    
-                    overlay.addTapControl({ x: 2, y: .25, width: 12, height: 3, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                        return true;
-                    });
-                    overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 18: A store got 45 notebooks delivered.\nThere were 5 boxes. How many notebooks are in each box?");
+                trigger3.setHeroCollisionCallback(lc3);
+                trigger3.setCollisionsEnabled(false);
+
+
+                let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, height: 2, img: "question_box.png" });
                 
-                    let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
+                let lc4 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q4_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
                             return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "6");
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[11].question.toString());
 
-                    let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
 
-                    let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
+                            };
 
-                    let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                            score = score + 1;
-                            jl.nav.dismissOverlayScene();
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[11].id.toString();
+                            let q4_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[11].optionOne.toString(), 
+                            question_set[11].answer.toString(), q_responses, an_entry, q4_start, q4_end);
                             return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "9");
-                });
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[11].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[11].id.toString();
+                            let q4_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[11].optionTwo.toString(), 
+                            question_set[11].answer.toString(), q_responses, an_entry, q4_start, q4_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[11].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[11].id.toString();
+                            let q4_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[11].optionThree.toString(), 
+                            question_set[11].answer.toString(), q_responses, an_entry, q4_start, q4_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[11].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[11].id.toString();
+                            let q4_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[11].optionFour.toString(), 
+                            question_set[11].answer.toString(), q_responses, an_entry, q4_start, q4_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[11].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                    });
                 return true;
-        };
-        trigger2.setHeroCollisionCallback(lc2);
-        // No transfer of momeuntum when the hero collides with the trigger
-        trigger2.setCollisionsEnabled(false);
+                };
 
+                trigger4.setHeroCollisionCallback(lc4);
+                trigger4.setCollisionsEnabled(false);
 
-        let trigger3 = jl.world.makeObstacle({ box: true, x: 45, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-        
-        let lc3 =
-        // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-        // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-        // Also move the obstacle forward, so we can hit it again.
+                let trigger5 = jl.world.makeObstacle({ box: true, x: 75, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+            
+                let lc5 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q5_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            return true;
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[12].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[12].id.toString();
+                            let q5_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[12].optionOne.toString(), 
+                            question_set[12].answer.toString(), q_responses, an_entry, q5_start, q5_end);
+                            return true;
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[12].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[12].id.toString();
+                            let q5_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[12].optionTwo.toString(), 
+                            question_set[12].answer.toString(), q_responses, an_entry, q5_start, q5_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[12].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[12].id.toString();
+                            let q5_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[12].optionThree.toString(), 
+                            question_set[12].answer.toString(), q_responses, an_entry, q5_start, q5_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[12].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[12].id.toString();
+                            let q5_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[12].optionFour.toString(), 
+                            question_set[12].answer.toString(), q_responses, an_entry, q5_start, q5_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[12].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                    });
+                return true;
+                };
+
+                trigger5.setHeroCollisionCallback(lc5);
+                trigger5.setCollisionsEnabled(false);
+
+                let trigger6 = jl.world.makeObstacle({ box: true, x: 90, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+    
+                let lc6 =
+                
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q6_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            return true;
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[13].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[13].id.toString();
+                            let q6_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[13].optionOne.toString(), 
+                            question_set[13].answer.toString(), q_responses, an_entry, q6_start, q6_end);
+                            return true;
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[13].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[13].id.toString();
+                            let q6_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[13].optionTwo.toString(), 
+                            question_set[13].answer.toString(), q_responses, an_entry, q6_start, q6_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[13].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[13].id.toString();
+                            let q6_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[13].optionThree.toString(), 
+                            question_set[13].answer.toString(), q_responses, an_entry, q6_start, q6_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[13].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[13].id.toString();
+                            let q6_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[13].optionFour.toString(), 
+                            question_set[13].answer.toString(), q_responses, an_entry, q6_start, q6_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[13].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                    });
+                return true;
+                };
+
+                trigger6.setHeroCollisionCallback(lc6);
+                trigger6.setCollisionsEnabled(false);
+
+                let trigger7 = jl.world.makeObstacle({ box: true, x: 105, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+    
+                let lc7 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q7_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            return true;
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[14].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[14].id.toString();
+                            let q7_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[14].optionOne.toString(), 
+                            question_set[14].answer.toString(), q_responses, an_entry, q7_start, q7_end);
+                            return true;
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[14].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[14].id.toString();
+                            let q7_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[14].optionTwo.toString(), 
+                            question_set[14].answer.toString(), q_responses, an_entry, q7_start, q7_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[14].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[14].id.toString();
+                            let q7_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[14].optionThree.toString(), 
+                            question_set[14].answer.toString(), q_responses, an_entry, q7_start, q7_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[14].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[14].id.toString();
+                            let q7_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[14].optionFour.toString(), 
+                            question_set[14].answer.toString(), q_responses, an_entry, q7_start, q7_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[14].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                    });
+                return true;
+                };
+
+                trigger7.setHeroCollisionCallback(lc7);
+                trigger7.setCollisionsEnabled(false);
+
+                let trigger8 = jl.world.makeObstacle({ box: true, x: 120, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+    
+                let lc8 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q8_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            return true;
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[15].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[15].id.toString();
+                            let q8_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[15].optionOne.toString(), 
+                            question_set[15].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+
+                            return true;
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[15].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[15].id.toString();
+                            let q8_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[15].optionTwo.toString(), 
+                            question_set[15].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[15].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[15].id.toString();
+                            let q8_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[15].optionThree.toString(), 
+                            question_set[15].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[15].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[15].id.toString();
+                            let q8_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[15].optionFour.toString(), 
+                            question_set[15].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[15].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                    });
+                return true;
+                };
+
+                trigger8.setHeroCollisionCallback(lc8);
+                trigger8.setCollisionsEnabled(false);
+                    
+    })
+
+    let user_id = jl.score.getSessionFact("user_id", "error"); 
+
+    console.log("the flag is " + flag);
+
+    let trigger1000 = jl.world.makeObstacle({ box: true, x: 125, y: 5.50, width: 3, height: 2, img: "" });
+        let lc2 =
         (thisActor: Obstacle, collideActor: Hero) => {
             thisActor.remove(true);
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                    return true;
-                });
-                
-                overlay.addTapControl({ x: 2, y: .25, width: 12, height: 3, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                    return true;
-                });
-                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 19: Mom baked 36 cookies. She divided the cookies into 9 bags.\nHow many cookies were in each bag?");
-            
-                let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "3");
-
-                let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
-
-                let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "9");
-
-                let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                    a11.remove(true);    
-                    a12.remove(true);
-                    a13.remove(true);
-                    a14.remove(true);
-                    overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                        score = score + 1;
-                        jl.nav.dismissOverlayScene();
-                        return true;
-                    })
-                    return true;
-               });
-                overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "4");
-            });
+            game_end = new Date().getTime();
+            console.log("end time is " + game_end)
             return true;
-    };
-    trigger3.setHeroCollisionCallback(lc3);
-    // No transfer of momeuntum when the hero collides with the trigger
-    trigger3.setCollisionsEnabled(false);
-
-
-    let trigger4 = jl.world.makeObstacle({ box: true, x: 60, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-        
-            let lc4 =
-            // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-            // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-            // Also move the obstacle forward, so we can hit it again.
-            (thisActor: Obstacle, collideActor: Hero) => {
-                thisActor.remove(true);
-                jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                    //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                        return true;
-                    });
-                    
-                    overlay.addTapControl({ x: 2, y: .25, width: 12, height: 3, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                        return true;
-                    });
-                    overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 20: The chef made 24 pancakes for 8 people.\nHow many pancakes did each person get?");
-                
-                    let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "4");
-
-                    let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                            score = score + 1;
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "3");
-
-                    let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "2");
-
-                    let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "1");
-                });
-                return true;
         };
-        trigger4.setHeroCollisionCallback(lc4);
-        // No transfer of momeuntum when the hero collides with the trigger
-        trigger4.setCollisionsEnabled(false);
+
+        trigger1000.setHeroCollisionCallback(lc2);
+        trigger1000.setCollisionsEnabled(false);
+
+    jl.world.makeDestination({ x: 126, y: 2, width: 4.5, height: 5, img: "flag.png" });
+    jl.score.setVictoryDestination(1);
+
+}
 
 
-        let trigger5 = jl.world.makeObstacle({ box: true, x: 75, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-        
-            let lc5 =
-            // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-            // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-            // Also move the obstacle forward, so we can hit it again.
-            (thisActor: Obstacle, collideActor: Hero) => {
-                thisActor.remove(true);
-                jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                    //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                        return true;
-                    });
-                    
-                    overlay.addTapControl({ x: 2, y: .25, width: 12, height: 3, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                        return true;
-                    });
-                    overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 21: The zookeeper had 56 grapes.\nHe wanted to share them equally with 7 sea otters.\nHow many will each sea otter get?");
-                
-                    let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                            score = score + 1;
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "8");
 
-                    let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "9");
+function timeDiff(start: any, end: any){
+    let time = (end - start)/1000
+    return time;
+}
 
-                    let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
+function clean_date(){
+    let today = new Date().toISOString().slice(0, 10)
+    return today;
+}
 
-                    let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "3");
-                });
-                return true;
-        };
-        trigger5.setHeroCollisionCallback(lc5);
-        // No transfer of momeuntum when the hero collides with the trigger
-        trigger5.setCollisionsEnabled(false);
+function postAttempts(user_id: any, array: any){
+    let a_url = 'http://localhost:8080/api/users/' + user_id + '/attempts'
+    fetch(a_url, {
+        method: "post",
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8'},
+    
+        body: JSON.stringify({
+                world: "spaceQuest",
+                date: clean_date(),
+                totalscore: score,
+                totaltime: timeDiff(game_start, game_end),
+                userId: user_id,
+        })
+    })
+
+    .then( (response) => { 
+        return response.json();
+    }).then(jsonResponse => {
+        console.log("the id you want elene is " + jsonResponse.id.toString());
+        postAnswers(array, jsonResponse.id.toString(), a_url);
+
+    }).catch (error => {
+        console.log(error)
+    })
+}
+
+function postAnswers(array: any, attemptID: any, a_url: any){
+    let s_url = a_url + '/' + attemptID;
+    console.log("the s_url is " + s_url);
+    fetch(s_url, {
+        method: "post",
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8'},
+        body: JSON.stringify({
+                array
+        })
+    })
+}
 
 
-        let trigger6 = jl.world.makeObstacle({ box: true, x: 90, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-        
-            let lc6 =
-            // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-            // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-            // Also move the obstacle forward, so we can hit it again.
-            (thisActor: Obstacle, collideActor: Hero) => {
-                thisActor.remove(true);
-                jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                    //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                        return true;
-                    });
-                    
-                    overlay.addTapControl({ x: 2, y: .25, width: 12, height: 3, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
-                        return true;
-                    });
-                    overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 22: Momma squirrel has 3 babies.\nShe wants to share 27 nuts with each baby.\nHow many nuts does each baby get?");
-                
-                    let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "9");
-
-                    let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                            score = score + 1;
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
-
-                    let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "3");
-
-                    let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "1");
-                });
-                return true;
-        };
-        trigger6.setHeroCollisionCallback(lc6);
-        // No transfer of momeuntum when the hero collides with the trigger
-        trigger6.setCollisionsEnabled(false);
-
-
-        let trigger7 = jl.world.makeObstacle({ box: true, x: 105, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-        
-            let lc7 =
-            // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-            // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-            // Also move the obstacle forward, so we can hit it again.
-            (thisActor: Obstacle, collideActor: Hero) => {
-                thisActor.remove(true);
-                jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                    //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                        return true;
-                    });
-                    
-                    overlay.addTapControl({x: 2, y: .25, width: 12, height: 3, img: "question_bar.png"}, (eventPositionX: number, eventPositionY: number) => {
-                        return true;
-                    });
-                    overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 23: A clothing store got 72 sweaters in stock.\nThere was an equal number of 9 colors.\nHow many sweaters were there of each color?");
-                
-                    let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "5");
-
-                    let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "6");
-
-                    let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
-
-                    let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                            score = score + 1;
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
-                });
-                return true;
-        };
-        trigger7.setHeroCollisionCallback(lc7);
-        // No transfer of momeuntum when the hero collides with the trigger
-        trigger7.setCollisionsEnabled(false);
-
-
-        let trigger8 = jl.world.makeObstacle({ box: true, x: 120, y: 5.50, width: 3, height: 2, img: "question_box.png" });
-        
-            let lc8 =
-            // Each time the hero hits the obstacle, we'll run this code to draw a new enemy
-            // and a new obstacle on the screen.  We'll randomize their placement just a bit.
-            // Also move the obstacle forward, so we can hit it again.
-            (thisActor: Obstacle, collideActor: Hero) => {
-                thisActor.remove(true);
-                jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-                    //overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#FFFFFF", size: 32, z: 0 }, () => "Game Paused");
-                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "black.png" }, (hudx: number, hudY: number) => {
-                        return true;
-                    });
-                    
-                    overlay.addTapControl({ x: 2, y: .25, width: 12, height: 3, img: "question_bar.png"}, (eventPositionX: number, eventPositionY: number) => {
-                        return true;
-                    });
-                    overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => "Question 24: A peach farmer picked 40 peaches.\nHe sold an equal number of peaches to 5 people.\nHow many did each person get?");
-                
-                    let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                            score = score + 1;
-                            winMessage(jl, score);
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => "6");
-
-                    let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            winMessage(jl, score);
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "7");
-
-                    let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                            winMessage(jl, score);
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "8");
-
-                    let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
-                        a11.remove(true);    
-                        a12.remove(true);
-                        a13.remove(true);
-                        a14.remove(true);
-                        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
-                            winMessage(jl, score);
-                            jl.nav.dismissOverlayScene();
-                            return true;
-                        })
-                        return true;
-                   });
-                    overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => "9");
-                });
-                return true;
-        };
-        trigger8.setHeroCollisionCallback(lc8);
-        // No transfer of momeuntum when the hero collides with the trigger
-        trigger8.setCollisionsEnabled(false);
-
-        jl.world.makeDestination({ x: 125, y: 2, width: 4.5, height: 5, img: "flag.png" });
-        jl.score.setVictoryDestination(1);
+function checkAnswer(jl: JetLagApi, overlay: OverlayApi, question_id: string, o1: any, o2: any, o3: any, o4: any, 
+    choice: string, right: string, answers: Array<any>, entry: array_entry, start_time: any, end_time: any) {
+    o1.remove(true);    
+    o2.remove(true); 
+    o3.remove(true);
+    o4.remove(true);
+    if (choice == right){
+        score++;
+        entry.correct = true;
+        entry.questionId = question_id;
+        entry.time = timeDiff(start_time, end_time);        
+        entry.picked = choice;
+        answers.push(entry)
+        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
+            jl.nav.dismissOverlayScene();
+            return true;
+        })
+    }
+    else {
+        entry.correct = false;
+        entry.questionId = question_id;
+        entry.time = timeDiff(start_time, end_time);        
+        entry.picked = choice;
+        answers.push(entry)
+        overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "wrong_bar.png" }, () => {
+            jl.nav.dismissOverlayScene();
+            return false;
+        })
 
     }
-    // Put the level number in the top right corner of every level
-    jl.hud.addText({ x: 15, y: .5, face: "arial", color: "#fcba03", size: 22, z: 2 }, () => "Level " + index);
+   
+    return true;
 }
+
 
 /**
  * This is a standard way of drawing a black screen with some text, to serve as
@@ -2358,6 +1724,7 @@ export function questionScreen(jl: JetLagApi, message: string) {
     });
 }
 
+
 /**
  * This is a standard way of drawing a black screen with some text, to serve as
  * the win screen for the game
@@ -2387,18 +1754,6 @@ export function eleneMessage(jl: JetLagApi, message: string, callback: () => voi
             callback();
     });
 }
-
-// jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-//     overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "entire_background.png" }, (hudx: number, hudY: number) => {
-//         jl.nav.dismissOverlayScene();
-//         return true;
-//     });
-
-//     overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#ffffff", size: 100, z: 0 }, () => "CONGRATULATIONS!");
-//     overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#ffffff", size: 80, z: 0 }, () => "Your score is " + score + "/8");
-
-// });
-// return true;
 
 /**
  * This is a standard way of drawing a black screen with some text, to serve as

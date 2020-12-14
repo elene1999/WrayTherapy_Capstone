@@ -32,6 +32,8 @@ export class NavigationApi {
      */
     public doHelp(whichHelp: number) { this.manager.doHelp(whichHelp); }
 
+    public doStore(whichStore: number) { this.manager.doStore(whichStore); }
+
     /** quit the game */
     public doQuit() { this.manager.doQuit(); }
 

@@ -25,7 +25,8 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
     if (index == 1) {
         // set up background and music
         //jl.setMusic("tune.ogg");
-        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 10, img: "planets_level.png", z: -2 });
+        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "planets_level.png", z: -2 });
+        jl.world.drawPicture({ x: 6, y: 1.25, width: 3.75, height: 6, img: "rocket.png"})
         //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "chooser.png" });
 
         // We'll have margins of 1.25 on the left and right, a margin of 1 on
@@ -36,13 +37,13 @@ export function buildChooserScreen(index: number, jl: JetLagApi): void {
         // drawLevelButton(jl, 5.25, 2.50, 2, 2, 2);
         // drawLevelButton(jl, 8.50, 1.50, 2, 2, 3);
         //tutorial
-        drawLevelButton(jl, 1.25, 5.75, 2.5, 2.5, 1); 
+        drawLevelButton(jl, 1.5, 4.75, 2.75, 2.9, 1); 
         //level 1(2)
-        drawLevelButton(jl, 4.4, 3.5, 2.75, 2.75, 2);
-        //level 2(6)
-        drawLevelButton(jl, 8, 5.75, 2.75, 2.75, 6);
-        //level 3(7)
-        drawLevelButton(jl, 11.2, 2.80, 3.5, 3, 7);
+        drawLevelButton(jl, 6, 1.25, 3.75, 6.75, 2);
+        // //level 2(6)
+        // drawLevelButton(jl, 8, 5.75, 2.75, 2.75, 6);
+        // //level 3(7)
+        // drawLevelButton(jl, 11.2, 2.80, 3.5, 3, 7);
         // drawLevelButton(jl, 6.50, 3.25, 1.25, 1.25, 4);
         // drawLevelButton(jl, 8.25, 3.25, 1.25, 1.25, 5);
         // drawLevelButton(jl, 10.00, 3.25, 1.25, 1.25, 6);

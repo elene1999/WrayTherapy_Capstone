@@ -17,6 +17,16 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
     // Based on the values in myconfig.ts, we can expect to have a level that is
     // 1600x900 pixels (16x9 meters), with no default gravitational forces
 
+    // let s = jl.score.getSessionFacts().cfg;
+    // let session: SessionState;
+    // if (!s) {
+    //     session = new SessionState();
+    //     jl.score.getSessionFacts().cfg = session;
+    // }
+    // else {
+    //     session = s as SessionState;
+    // }
+
     // start the music
     jl.setMusic("tune.ogg");
 
@@ -33,6 +43,11 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
         return true;
     });
 
+    jl.hud.addTapControl({ x: 1, y: 6, width: 4.25, height: 1.50, img: "" }, () => {
+        jl.nav.doStore(2);
+        return true;
+    });
+
     // Do the same, but this button goes to the first help screen
     jl.hud.addTapControl({ x: 1.95, y: 4.95, width: 3, height: .9, img: "" }, () => {
         jl.nav.doHelp(1);
@@ -44,6 +59,19 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
         jl.nav.doQuit();
         return true;
     });
+
+    //spear's code
+    // let s = jl.score.getSessionFacts().cfg;
+    // let session: SessionState;
+    // if (!s) {
+    //     session = new SessionState();
+    //     jl.score.getSessionFacts().cfg = session;
+    // }
+    // else {
+    //     session = s as SessionState;
+    // }
+
+
 
     // Draw an obstacle that we can use as a mute button
     let o = jl.world.makeObstacle({ box: true, x: 15, y: 8, width: .75, height: .75, img: "audio_off.png" });

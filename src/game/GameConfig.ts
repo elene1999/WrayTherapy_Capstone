@@ -26,7 +26,7 @@ export class GameConfig extends JetLagConfig {
     this.adaptToScreenSize = true;
     this.pixelMeterRatio = 100;
     this.canVibrate = true;
-    this.debugMode = false; //this is the green lines
+    this.debugMode = true; //this is the green lines
     this.forceAccelerometerOff = true;
     this.verbosity = JetLagVerbosity.LOUD;
 
@@ -95,7 +95,9 @@ export class GameConfig extends JetLagConfig {
         "a31.png", "a32.png", "a33.png", "a34.png", "a35.png", "a36.png", "a37.png", "a38.png", "a39.png", "a40.png", 
         "a41.png", "a42.png", "a43.png", "a44.png", "a45.png", "a46.png", "a47.png", "a48.png", "a49.png", "a50.png",
       //screens
-      "add_on.png", "draw_a_picture.png", "lets_learn.png", "skip_count.png", "test.png"
+      "add_on.png", "draw_a_picture.png", "lets_learn.png", "skip_count.png", "test.png",
+      //tutorial
+      "t_welcome.png", "t_2.png", "t_3.png", "t_4.png", "t_5.png", "t_6.png"
     ];
 
     // list the sound effects that the game will use
