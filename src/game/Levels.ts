@@ -1770,4 +1770,3 @@ export function loseMessage(jl: JetLagApi, message: string, callback: () => void
             callback();
     });
 }
-
