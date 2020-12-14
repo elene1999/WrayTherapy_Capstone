@@ -38,27 +38,27 @@ export function buildSplashScreen(index: number, jl: JetLagApi): void {
     // Place an invisible button over the "Play" text on the background image,
     // and set it up so that pressing it switches to the first page of the level
     // chooser.
-    jl.hud.addTapControl({ x: 5.90, y: 4.65, width: 4.25, height: 1.50, img: "" }, () => {
-        jl.nav.doChooser(1);
-        return true;
-    });
+    // jl.hud.addTapControl({ x: 5.90, y: 4.65, width: 4.25, height: 1.50, img: "" }, () => {
+    //     jl.nav.doChooser(1);
+    //     return true;
+    // });
 
-    jl.hud.addTapControl({ x: 1, y: 6, width: 4.25, height: 1.50, img: "" }, () => {
+    jl.hud.addTapControl({ x: 5.7, y: 5.4, width: 4.7, height: 1.8, img: "" }, () => {
         jl.nav.doStore(2);
         return true;
     });
 
     // Do the same, but this button goes to the first help screen
-    jl.hud.addTapControl({ x: 1.95, y: 4.95, width: 3, height: .9, img: "" }, () => {
-        jl.nav.doHelp(1);
-        return true;
-    });
+    // jl.hud.addTapControl({ x: 1.95, y: 4.95, width: 3, height: .9, img: "" }, () => {
+    //     jl.nav.doHelp(1);
+    //     return true;
+    // });
 
     // Set up the quit button
-    jl.hud.addTapControl({ x: 11.25, y: 4.95, width: 3, height: .9, img: "" }, () => {
-        jl.nav.doQuit();
-        return true;
-    });
+    // jl.hud.addTapControl({ x: 11.25, y: 4.95, width: 3, height: .9, img: "" }, () => {
+    //     jl.nav.doQuit();
+    //     return true;
+    // });
 
     //spear's code
     // let s = jl.score.getSessionFacts().cfg;

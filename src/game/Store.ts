@@ -29,7 +29,7 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
         jl.world.setBackgroundColor(0x00000);
 
         // // put some information and pictures on the screen
-        jl.world.addText({ center: true, x: 8, y: 1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => "The help page is still in development :) Come back soon!");
+        //l.world.addText({ center: true, x: 8, y: 1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => "The help page is still in development :) Come back soon!");
 
         interface User {
             id: string
@@ -37,7 +37,8 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
         }
 
         function getUsers(): Promise<User[]> {
-            return fetch('http://localhost:8080/api/users/')
+            //return fetch('http://localhost:8080/api/users/')
+            return fetch('http://18.213.184.103:8080/api/users/')
                 .then(res => res.json())
                 .then(res => {
                     return res as User[]
@@ -51,50 +52,30 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
             .then(users => {
 
                 num_users = users.length;
-                //console.dir(users)
-
-                // for (let row = 0, y = 3.25, l = 0; row < 3; ++row, y += 1.75) {
-                //     let x = .75;
-                //     // i = number of boxes per row 
-                //     for (let i = 0; i < 4; ++i, ++l, x += 3.75) {
-                //         if (l < num_users){
-                //             drawLevelButton(jl, x, y, 3, 1.25, l);
-
-                //         }
-                //     }
-                // }
-
+            
                 let b_counter = 0;
-                for (let row = 0, y = 3.25, l = 0; row < 3; ++row, y += 1.75) {
-                    let x = .75;
+                for (let row = 0, y = 2.6, l = 0; row < 3; ++row, y += 1.75) {
+                    let x = 1.15;
                     // i = number of boxes per row 
-                    for (let i = 0; i < 4; ++i, ++l, x += 3.75) {
+                    for (let i = 0; i < 4; ++i, ++l, x += 3.6) {
                         if (l < num_users){
                             drawUserButton(jl, x, y, 3, 1.25, "user_id", users[b_counter].id.toString());
+                            let e = users[b_counter].username.toString();
+                            console.log(e);
+                            jl.hud.addText({ x: x + 0.5 , y: y + 0.25, face: "Helvetica", color: "#000000", size: 50, z: 2 }, () => e);
+                            jl.world.drawPicture({ x: x, y: y, width: 3, height: 1.25, img: "white_box.png"});
                             b_counter++;
+                            ////jl.hud.addText({ x: x, y: 2, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => users[b_counter].username.toString());
 
                         }
                     }
                 }
 
-                // let counter = 0;
-                // for (let row = 0, y = 3.25, l = 0; row < 3; ++row, y += 1.75) {
-                //     let x = .75;
-                //     // i = number of boxes per row 
-                //     for (let i = 0; i < 4; i++, l++, x += 3.75) {
-                //         if (counter < num_users){
-                //             jl.hud.addText({ x: x, y: 2, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => users[counter].username.toString());
-                //             console.log("counter:" + counter);
-                //             console.log("user:" + users[counter].username.toString())
-                //             counter++;
-                //         }
-                //     }
-                // }
 
             })
 
 
-        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "background_small_stars.png" });
+        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "user_menu.png" });
         // draw the navigation buttons
         if (index < 0){
             drawNextButton(jl, 15, 5.125, 1, 1, index + 1);
@@ -105,11 +86,12 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
 
     }
 
+    //QuestionSet screen
     if (index == 1) {
-        jl.world.setBackgroundColor(0x00000);
+        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "set_menu.png" });
 
-        // // put some information and pictures on the screen
-        jl.world.addText({ center: true, x: 8, y: 1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => "The help page is still in development :) Come back soon!");
+        //put some information and pictures on the screen
+        //jl.world.addText({ center: true, x: 8, y: 1, face: "Arial", color: "#FFFFFF", size: 56, z: 0 }, () => "The help page is still in development :) Come back soon!");
 
         interface QuestionSets {
             id: string
@@ -120,7 +102,8 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
         }
 
         function getQuestionSets(): Promise<QuestionSets[]> {
-            return fetch('http://localhost:8080/api/questionSets')
+            //return fetch('http://localhost:8080/api/questionSets')
+            return fetch('http://18.213.184.103:8080/api/questionSets')
                 .then(res => res.json())
                 .then(res => {
                     return res as QuestionSets[]
@@ -134,33 +117,58 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
             .then(question_sets => {
 
                 num_sets = question_sets.length;
-                //console.dir(question_sets)
 
                 let b_counter = 0;
-                for (let row = 0, y = 3.25, l = 0; row < 3; ++row, y += 1.75) {
-                    let x = .75;
+                for (let row = 0, y = 2.6, l = 0; row < 3; ++row, y += 1.75) {
+                    let x = 1.5;
                     // i = number of boxes per row 
-                    for (let i = 0; i < 4; ++i, ++l, x += 3.75) {
+                    for (let i = 0; i < 3; ++i, ++l, x += 4.5) {
                         if (l < num_sets){
-                            drawSetButton(jl, x, y, 3, 1.25, "set_id", question_sets[b_counter].id.toString());
+                            drawSetButton(jl, x, y, 3, 2.5, "set_id", question_sets[b_counter].id.toString());
+                            let id = question_sets[b_counter].id.toString();
+                            let subject = question_sets[b_counter].subject.toString();
+                            let topic = question_sets[b_counter].topic.toString();
+                            console.log(id);
+                            //jl.hud.addText({ x: x + 0.5 , y: y + 0.25, face: "Helvetica", color: "#000000", size: 50, z: 2 }, () => id);
+                            jl.hud.addText({ x: x + 1 , y: y + 0.75, face: "Helvetica", color: "#000000", size: 40, z: 2 }, () => subject);
+                            jl.hud.addText({ x: x + 0.72 , y: y + 1.25, face: "Helvetica", color: "#0d3cd6", size: 40, z: 2 }, () => topic);
+                            jl.world.drawPicture({ x: x, y: y, width: 3, height: 2.5, img: "orange_box.png"});
                             b_counter++;
+                            ////jl.hud.addText({ x: x, y: 2, face: "Arial", color: "#3C46FF", size: 12, z: 2 }, () => users[b_counter].username.toString());
 
                         }
                     }
                 }
 
-                jl.hud.addText({ x: 2.25, y: 3.5, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[0].id.toString());
-                jl.hud.addText({ x: 2.1, y: 3.8, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[0].subject.toString());
-                jl.hud.addText({ x: 1.95, y: 4.1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[0].topic.toString());
+                //console.dir(question_sets)
 
-                jl.hud.addText({ x: 6, y: 3.5, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[1].id.toString());
-                jl.hud.addText({ x: 5.85, y: 3.8, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[1].subject.toString());
-                jl.hud.addText({ x: 5.7, y: 4.1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[1].topic.toString());
+                // let b_counter = 0;
+                // for (let row = 0, y = 3.25, l = 0; row < 3; ++row, y += 1.75) {
+                //     let x = .75;
+                //     // i = number of boxes per row 
+                //     for (let i = 0; i < 4; ++i, ++l, x += 3.75) {
+                //         if (l < num_sets){
+                //             let e = question_sets[b_counter].id.toString();
+                //             console.log(e);
+                //             //jl.world.drawPicture({ x: x, y: y, width: 3, height: 1.25, img: "white_box.png"});
+                //             jl.hud.addText({ x: x + 0.5 , y: y + 0.25, face: "Helvetica", color: "#000000", size: 50, z: 2 }, () => e);
+                //             drawSetButton(jl, x, y, 3, 1.25, "set_id", question_sets[b_counter].id.toString());
+                //             b_counter++;
+
+                //         }
+                //     }
+                // }
+
+                // jl.hud.addText({ x: 2.25, y: 3.5, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[0].id.toString());
+                // jl.hud.addText({ x: 2.1, y: 3.8, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[0].subject.toString());
+                // jl.hud.addText({ x: 1.95, y: 4.1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[0].topic.toString());
+
+                // jl.hud.addText({ x: 6, y: 3.5, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[1].id.toString());
+                // jl.hud.addText({ x: 5.85, y: 3.8, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[1].subject.toString());
+                // jl.hud.addText({ x: 5.7, y: 4.1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[1].topic.toString());
 
             })
 
-
-        jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "background_small_stars.png" });
         // draw the navigation buttons
         if (index < 0){
             drawNextButton(jl, 15, 5.125, 1, 1, index + 1);
@@ -206,9 +214,7 @@ function drawUserButton(jl: JetLagApi, x: number, y: number, width: number, heig
     //tile.setTapHandler(() => { jl.nav.doChooser(1); return true; });
      tile.setTapHandler(() => {
          jl.score.setSessionFact(fact_name, user_id); 
-        //  console.log("fact name is " + fact_name);
-        //  console.log("id " + user_id);
-         jl.nav.doStore(1)
+         jl.nav.doChooser(1)
          return true; });
 
      
@@ -223,8 +229,6 @@ function drawSetButton(jl: JetLagApi, x: number, y: number, width: number, heigh
     //tile.setTapHandler(() => { jl.nav.doChooser(1); return true; });
      tile.setTapHandler(() => {
          jl.score.setSessionFact(fact_name, set_id); 
-        //  console.log("fact name is " + fact_name);
-        //  console.log("id " + set_id);
          jl.nav.doChooser(1)
          return true; });
 
