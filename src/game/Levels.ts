@@ -33,6 +33,7 @@ let score = 0;
 
 let game_start: number;
 let game_end: number;
+console.log(game_start + game_end);
 let q_responses: any[] = [];
 
 let flag = false;
@@ -180,7 +181,8 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
     }
 
         //earth
-    if (index == 2) {
+        //2
+    if (index == 4) {
             jl.world.setCameraBounds(160, 9);
             jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
             let h = jl.world.makeHero({ x: 0, y: 2.75, width: 2, height: 5, img: "a1.png", box: true});
@@ -228,42 +230,45 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
     }
     
         //space shuttle
-    if (index == 4) {
+        //4
+    if (index == 2) {
             jl.world.setCameraBounds(160, 9);
             jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
         
         
-            jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "inside_spaceship.png"}, 0);
+            //jl.world.addHorizontalBackgroundLayer({ x: 0, y: 0, width: 16, height: 9, img: "Inside_Space_Shuttle.png"}, 0);
+            jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "inside_spaceship.png", z: -1 });
     
+            //jl.world.drawPicture({ x: 5, y: 1, width: 6, height: 3, img: "welcome.png"})
+
+            //jl.hud.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, () => {
+                jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+
+                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "Welcome_Inside_Space_Shuttle.png" }, () => {
+                        
+                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "lets_learn.png" }, () => {
     
-            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
-
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "inside_spaceship.png" }, () => {
-
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "lets_learn.png" }, () => {
-
-                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "draw_a_picture.png"}, () => {
-                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "skip_count.png"}, () => {
-                        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "add_on.png"}, () => {
-                            jl.nav.dismissOverlayScene();
+                    overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "draw_a_picture.png"}, () => {
+                        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "skip_count.png"}, () => {
+                            overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "add_on.png"}, () => {
+                                jl.nav.dismissOverlayScene();
+                                return true;
+                            })
                             return true;
                         })
                         return true;
                     })
                     return true;
-                })
-                return true;
-                });
-                return true;
+                    });
+                    return true;
+                    //});
+                    });
+               return true;
             });
-        });
-                
-            //welcome.hidden(true); 
-    
-            //welcomeMessage(jl, "Speed boosters and reducers");
-            //loseMessage("Try Again");
-    
-            jl.hud.addTapControl({ x: 7, y: 2, width: 2, height: 1, img: "readybutton.png" }, () => {
+            //jl.world.add({ x: 0, y: 0, width: 16, height: 9, img: "Inside_Space_Shuttle.png"}, 0);
+            //jl.world.drawPicture({ x: 0, y: 0, width: 16, height: 9, img: "Inside_Space_Shuttle.png", z: -1 });
+            
+            jl.hud.addTapControl({ x: 7, y: 2, width: 2, height: 2, img: "start.png" }, () => {
                 jl.nav.doLevel(5);
                 return true;
             });
@@ -2365,7 +2370,7 @@ function postAttempts(user_id: any, array: any){
                 world: "spaceQuest",
                 date: clean_date(),
                 totalscore: score,
-                totaltime: timeDiff(game_start, game_end),
+                totaltime: 172.2,
                 userId: user_id,
         })
     })
