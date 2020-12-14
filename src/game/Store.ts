@@ -121,10 +121,10 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
                 let b_counter = 0;
                 for (let row = 0, y = 2.6, l = 0; row < 3; ++row, y += 1.75) {
                     let x = 1.5;
-                    // i = number of boxes per row 
                     for (let i = 0; i < 3; ++i, ++l, x += 4.5) {
                         if (l < num_sets){
                             drawSetButton(jl, x, y, 3, 2.5, "set_id", question_sets[b_counter].id.toString());
+                            console.log("the set_id is " + jl.score.getSessionFact("set_id", "error")); 
                             let id = question_sets[b_counter].id.toString();
                             let subject = question_sets[b_counter].subject.toString();
                             let topic = question_sets[b_counter].topic.toString();
@@ -140,33 +140,6 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
                     }
                 }
 
-                //console.dir(question_sets)
-
-                // let b_counter = 0;
-                // for (let row = 0, y = 3.25, l = 0; row < 3; ++row, y += 1.75) {
-                //     let x = .75;
-                //     // i = number of boxes per row 
-                //     for (let i = 0; i < 4; ++i, ++l, x += 3.75) {
-                //         if (l < num_sets){
-                //             let e = question_sets[b_counter].id.toString();
-                //             console.log(e);
-                //             //jl.world.drawPicture({ x: x, y: y, width: 3, height: 1.25, img: "white_box.png"});
-                //             jl.hud.addText({ x: x + 0.5 , y: y + 0.25, face: "Helvetica", color: "#000000", size: 50, z: 2 }, () => e);
-                //             drawSetButton(jl, x, y, 3, 1.25, "set_id", question_sets[b_counter].id.toString());
-                //             b_counter++;
-
-                //         }
-                //     }
-                // }
-
-                // jl.hud.addText({ x: 2.25, y: 3.5, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[0].id.toString());
-                // jl.hud.addText({ x: 2.1, y: 3.8, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[0].subject.toString());
-                // jl.hud.addText({ x: 1.95, y: 4.1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[0].topic.toString());
-
-                // jl.hud.addText({ x: 6, y: 3.5, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[1].id.toString());
-                // jl.hud.addText({ x: 5.85, y: 3.8, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[1].subject.toString());
-                // jl.hud.addText({ x: 5.7, y: 4.1, face: "Arial", color: "#FFFFFF", size: 20, z: 2 }, () => question_sets[1].topic.toString());
-
             })
 
         // draw the navigation buttons
@@ -177,12 +150,6 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
         drawSplashButton(jl, 15, 8, 1, 1);
         
     }
-
-        // set up a control to go to the splash screen on screen tap
-        // jl.hud.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "" }, () => {
-        //     jl.nav.doSplash(1);
-        //     return true;
-        // });      
 }
 
 /**
@@ -214,7 +181,7 @@ function drawUserButton(jl: JetLagApi, x: number, y: number, width: number, heig
     //tile.setTapHandler(() => { jl.nav.doChooser(1); return true; });
      tile.setTapHandler(() => {
          jl.score.setSessionFact(fact_name, user_id); 
-         jl.nav.doChooser(1)
+         jl.nav.doStore(1)
          return true; });
 
      

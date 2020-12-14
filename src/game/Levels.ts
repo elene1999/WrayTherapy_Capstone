@@ -876,6 +876,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             let q8_end = new Date().getTime();
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionOne.toString(), 
                             question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+                            postAttempts(user_id, q_responses);
                             return true;
 
                     });
@@ -886,6 +887,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             let q8_end = new Date().getTime();
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionTwo.toString(), 
                             question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[7].optionTwo.toString());
@@ -895,6 +897,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             let q8_end = new Date().getTime();
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionThree.toString(), 
                             question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[7].optionThree.toString());
@@ -904,6 +907,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             let q8_end = new Date().getTime();
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionFour.toString(), 
                             question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
+                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[7].optionFour.toString());
@@ -923,6 +927,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                 trigger8.setCollisionsEnabled(false);
                     
     })
+    let user_id = jl.score.getSessionFact("user_id", "error"); 
 
     console.log("the flag is " + flag);
 
@@ -2182,7 +2187,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[23].optionOne.toString(), 
                             question_set[23].answer.toString(), q_responses, an_entry, q8_start, q8_end);
                             game_end = new Date().getTime();
-                            postAttempts(user_id, q_responses);
                             return true;
 
                     });
@@ -2194,7 +2198,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[23].optionTwo.toString(), 
                             question_set[23].answer.toString(), q_responses, an_entry, q8_start, q8_end);
                             game_end = new Date().getTime();
-                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[23].optionTwo.toString());
@@ -2205,7 +2208,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[23].optionThree.toString(), 
                             question_set[23].answer.toString(), q_responses, an_entry, q8_start, q8_end);
                             game_end = new Date().getTime();
-                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[23].optionThree.toString());
@@ -2216,7 +2218,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[23].optionFour.toString(), 
                             question_set[23].answer.toString(), q_responses, an_entry, q8_start, q8_end);
                             game_end = new Date().getTime();
-                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[23].optionFour.toString());
@@ -2234,25 +2235,108 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
 
                 trigger8.setHeroCollisionCallback(lc8);
                 trigger8.setCollisionsEnabled(false);
+
+                let trigger9 = jl.world.makeObstacle({ box: true, x: 135, y: 5.50, width: 3, height: 2, img: "question_box.png" });
+    
+                let lc9 =
+                (thisActor: Obstacle, collideActor: Hero) => {
+                    let q9_start = new Date().getTime();
+                    thisActor.remove(true);
+                    jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                        overlay.addImage({ x: 0, y: 0, width: 16, height: 9, img: "black.png" });
+                
+                        overlay.addTapControl({ x: 5.5, y: .75, width: 5, height: 2, img: "question_bar.png" }, (eventPositionX: number, eventPositionY: number) => {
+                            return true;
+                        });
+                        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#000000", size: 40, z: 0 }, () => question_set[24].question.toString());
+
+                        var an_entry: array_entry = {
+                                questionId: 0,
+                                correct: 0,
+                                time: 0,
+                                picked: 0,
+
+                            };
+
+                        let a11 = overlay.addTapControl({ x: 1.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[24].id.toString();
+                            let q9_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[24].optionOne.toString(), 
+                            question_set[24].answer.toString(), q_responses, an_entry, q9_start, q9_end);
+                            game_end = new Date().getTime();
+                            //postAttempts(user_id, q_responses);
+                            return true;
+
+                    });
+                        overlay.addText({ center: true, x: 2.75, y: 4.625, face: "Arial", color: "#101010", size: 75, z: 0 }, () => question_set[24].optionOne.toString());
+
+                        let a12 = overlay.addTapControl({ x: 5.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[24].id.toString();
+                            let q9_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[24].optionTwo.toString(), 
+                            question_set[24].answer.toString(), q_responses, an_entry, q9_start, q9_end);
+                            game_end = new Date().getTime();
+                            //postAttempts(user_id, q_responses);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[24].optionTwo.toString());
+
+                        let a13 = overlay.addTapControl({ x: 8.75, y: 3.5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[24].id.toString();
+                            let q9_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[24].optionThree.toString(), 
+                            question_set[24].answer.toString(), q_responses, an_entry, q9_start, q9_end);
+                            game_end = new Date().getTime();
+                            //postAttempts(user_id, q_responses);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[24].optionThree.toString());
+
+                        let a14 = overlay.addTapControl({ x: 12.25, y: 5, width: 2, height: 2, img: "answer_bar.png" }, () => {
+                            let q_id = question_set[24].id.toString();
+                            let q9_end = new Date().getTime();
+                            checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[24].optionFour.toString(), 
+                            question_set[24].answer.toString(), q_responses, an_entry, q9_start, q9_end);
+                            game_end = new Date().getTime();
+                            //postAttempts(user_id, q_responses);
+                            return true;
+                    });
+                        overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[24].optionFour.toString());
+
+                        overlay.addTapControl({ x: 10, y: 2.25, width: 1, height: .5, img: "hint.png" }, () => {
+                            let hint_bar_1 = overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "hint_bar.png" }, () => {
+                                hint_bar_1.remove(true);
+                                return true;
+                                })
+                            return true;
+                        });
+                    });
+                return true;
+                };
+
+                trigger9.setHeroCollisionCallback(lc9);
+                trigger9.setCollisionsEnabled(false);
                     
     })
 
-    let user_id = jl.score.getSessionFact("user_id", "error"); 
+    //let user_id = jl.score.getSessionFact("user_id", "error"); 
 
     console.log("the flag is " + flag);
 
-    let trigger1000 = jl.world.makeObstacle({ box: true, x: 125, y: 5.50, width: 3, height: 2, img: "" });
+    let trigger1000 = jl.world.makeObstacle({ box: true, x: 140, y: 2, width: 4.5, height: 5, img: "flag" });
         let lc2 =
         (thisActor: Obstacle, collideActor: Hero) => {
             thisActor.remove(true);
             console.log("end time is " + game_end)
+            winMessage(jl, score);
+
             return true;
         };
 
         trigger1000.setHeroCollisionCallback(lc2);
         trigger1000.setCollisionsEnabled(false);
 
-    jl.world.makeDestination({ x: 126, y: 2, width: 4.5, height: 5, img: "flag.png" });
+    //jl.world.makeDestination({ x: 126, y: 2, width: 4.5, height: 5, img: "flag.png" });
     jl.score.setVictoryDestination(1);
 
     }
