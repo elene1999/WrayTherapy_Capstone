@@ -23,6 +23,7 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
     // of ESCAPE, but when the key is released.
     jl.setUpKeyAction(JetLagKeys.ESCAPE, () => { jl.nav.doSplash(1); });
 
+    //user selection screen
     if (index == 2) {
 
         // Light blue background
@@ -37,8 +38,8 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
         }
 
         function getUsers(): Promise<User[]> {
-            //return fetch('http://localhost:8080/api/users/')
-            return fetch('http://18.213.184.103:8080/api/users/')
+            return fetch('http://localhost:8080/api/users/')
+            //return fetch('http://18.213.184.103:8080/api/users/')
                 .then(res => res.json())
                 .then(res => {
                     return res as User[]
@@ -102,8 +103,8 @@ export function buildStoreScreen(index: number, jl: JetLagApi): void {
         }
 
         function getQuestionSets(): Promise<QuestionSets[]> {
-            //return fetch('http://localhost:8080/api/questionSets')
-            return fetch('http://18.213.184.103:8080/api/questionSets')
+            return fetch('http://localhost:8080/api/questionSets')
+            //return fetch('http://18.213.184.103:8080/api/questionSets')
                 .then(res => res.json())
                 .then(res => {
                     return res as QuestionSets[]

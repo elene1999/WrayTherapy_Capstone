@@ -33,7 +33,6 @@ let score = 0;
 
 let game_start: number;
 let game_end: number;
-console.log(game_start + game_end);
 let q_responses: any[] = [];
 
 let flag = false;
@@ -103,7 +102,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                         a14.remove(true);
                         t4.remove(true);
                         overlay.addTapControl({ x: 4, y: 3, width: 8, height: 3, img: "right_bar.png" }, () => {
-                            score = score + 1;
                             jl.nav.dismissOverlayScene();
                             return true;
                         })
@@ -182,7 +180,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
 
         //earth
         //2
-    if (index == 4) {
+    if (index == 2) {
             jl.world.setCameraBounds(160, 9);
             jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
             let h = jl.world.makeHero({ x: 0, y: 2.75, width: 2, height: 5, img: "a1.png", box: true});
@@ -231,7 +229,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
     
         //space shuttle
         //4
-    if (index == 2) {
+    if (index == 4) {
             jl.world.setCameraBounds(160, 9);
             jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
         
@@ -287,6 +285,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
     //lvl 1
     if (index == 5) {
         game_start = new Date().getTime();
+        console.log("the original game start is: " + game_start)
         jl.world.setCameraBounds(160, 9);
         jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
         let h = jl.world.makeHero({ x: 0, y: 2.75, width: 2, height: 5, img: "a1.png", box: true});
@@ -321,8 +320,8 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
 
         let set_id = jl.score.getSessionFact("set_id", "error"); 
         console.log(set_id);
-        //let url = "http://localhost:8080/api/questions/sets/" + set_id;
-        let url = "http://18.213.184.103:8080/api/questions/sets/" + set_id;
+        let url = "http://localhost:8080/api/questions/sets/" + set_id;
+        //let url = "http://18.213.184.103:8080/api/questions/sets/" + set_id;
 
         function getQuestion_Set(): Promise<Question_Set[]> {
             return fetch(url)
@@ -335,7 +334,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
          //let result = document.getElementById('result')
         getQuestion_Set()
             .then(question_set => {
-
                 let trigger1 = jl.world.makeObstacle({ box: true, x: 15, y: 5.50, width: 3, height: 2, img: "question_box.png" });
                 
                 let lc =
@@ -881,7 +879,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             let q8_end = new Date().getTime();
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionOne.toString(), 
                             question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
-                            postAttempts(user_id, q_responses);
                             return true;
 
                     });
@@ -892,7 +889,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             let q8_end = new Date().getTime();
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionTwo.toString(), 
                             question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
-                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[7].optionTwo.toString());
@@ -902,7 +898,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             let q8_end = new Date().getTime();
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionThree.toString(), 
                             question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
-                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[7].optionThree.toString());
@@ -912,7 +907,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             let q8_end = new Date().getTime();
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[7].optionFour.toString(), 
                             question_set[7].answer.toString(), q_responses, an_entry, q8_start, q8_end);
-                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[7].optionFour.toString());
@@ -932,7 +926,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                 trigger8.setCollisionsEnabled(false);
                     
     })
-    let user_id = jl.score.getSessionFact("user_id", "error"); 
 
     console.log("the flag is " + flag);
 
@@ -977,8 +970,8 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
         }
 
         let set_id = jl.score.getSessionFact("set_id", "error"); 
-        //let url = "http://localhost:8080/api/questions/sets/" + set_id;
-        let url = "http://18.213.184.103:8080/api/questions/sets/" + set_id;
+        let url = "http://localhost:8080/api/questions/sets/" + set_id;
+        //let url = "http://18.213.184.103:8080/api/questions/sets/" + set_id;
 
         function getQuestion_Set(): Promise<Question_Set[]> {
             return fetch(url)
@@ -1593,8 +1586,8 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
 
     //level 3
     else if (index == 7) {
-        jl.world.setCameraBounds(160, 9);
-        jl.world.drawBoundingBox(0, 0, 160, 9, "", 1, 0, 1);
+        jl.world.setCameraBounds(300, 9);
+        jl.world.drawBoundingBox(0, 0, 300, 9, "", 1, 0, 1);
         let h = jl.world.makeHero({ x: 0, y: 2.75, width: 2, height: 5, img: "a1.png", box: true});
         h.setDefaultAnimation(jl.makeAnimation(25, true, [
         "a1.png", "a2.png",  "a3.png", "a4.png", "a5.png", "a6.png", "a7.png", "a8.png", "a9.png", "a10.png", 
@@ -1606,8 +1599,6 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
         h.setPhysics(5, 0, 0.6);
         h.addVelocity(1, 0);
         jl.world.setCameraChase(h);
-        jl.world.makeDestination({ x: 159, y: 0, width: 1, height: 1, img: "mustardball.png" });
-        jl.score.setVictoryDestination(1);
 
         // set up our background, with a few layers
         jl.world.setBackgroundColor(0x101010);
@@ -1628,8 +1619,8 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
         }
 
         let set_id = jl.score.getSessionFact("set_id", "error"); 
-        //let url = "http://localhost:8080/api/questions/sets/" + set_id;
-        let url = "http://18.213.184.103:8080/api/questions/sets/" + set_id;
+        let url = "http://localhost:8080/api/questions/sets/" + set_id;
+        //let url = "http://18.213.184.103:8080/api/questions/sets/" + set_id;
 
         function getQuestion_Set(): Promise<Question_Set[]> {
             return fetch(url)
@@ -2241,6 +2232,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                 trigger8.setHeroCollisionCallback(lc8);
                 trigger8.setCollisionsEnabled(false);
 
+                 //135
                 let trigger9 = jl.world.makeObstacle({ box: true, x: 135, y: 5.50, width: 3, height: 2, img: "question_box.png" });
     
                 let lc9 =
@@ -2269,7 +2261,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[24].optionOne.toString(), 
                             question_set[24].answer.toString(), q_responses, an_entry, q9_start, q9_end);
                             game_end = new Date().getTime();
-                            //postAttempts(user_id, q_responses);
+                            postAttempts(user_id, q_responses);
                             return true;
 
                     });
@@ -2281,7 +2273,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[24].optionTwo.toString(), 
                             question_set[24].answer.toString(), q_responses, an_entry, q9_start, q9_end);
                             game_end = new Date().getTime();
-                            //postAttempts(user_id, q_responses);
+                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 6.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[24].optionTwo.toString());
@@ -2292,7 +2284,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[24].optionThree.toString(), 
                             question_set[24].answer.toString(), q_responses, an_entry, q9_start, q9_end);
                             game_end = new Date().getTime();
-                            //postAttempts(user_id, q_responses);
+                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 9.75, y: 4.625, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[24].optionThree.toString());
@@ -2303,7 +2295,7 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                             checkAnswer(jl, overlay, q_id, a11, a12, a13, a14, question_set[24].optionFour.toString(), 
                             question_set[24].answer.toString(), q_responses, an_entry, q9_start, q9_end);
                             game_end = new Date().getTime();
-                            //postAttempts(user_id, q_responses);
+                            postAttempts(user_id, q_responses);
                             return true;
                     });
                         overlay.addText({ center: true, x: 13.25, y: 6.125, face: "Arial", color: "#0f0f0f", size: 75, z: 0 }, () => question_set[24].optionFour.toString());
@@ -2324,25 +2316,34 @@ export async function buildLevelScreen(index: number, jl: JetLagApi): Promise<vo
                     
     })
 
-    //let user_id = jl.score.getSessionFact("user_id", "error"); 
-
-    console.log("the flag is " + flag);
-
-    let trigger1000 = jl.world.makeObstacle({ box: true, x: 140, y: 2, width: 4.5, height: 5, img: "flag" });
-        let lc2 =
+    let user_id = jl.score.getSessionFact("user_id", "error"); 
+    jl.score.setVictoryDestination(1);
+    let trigger1000 = jl.world.makeObstacle({ box: true, x: 140, y: 2, width: 4.5, height: 5, img: "flag.png" });
+        let lc1000 =
         (thisActor: Obstacle, collideActor: Hero) => {
             thisActor.remove(true);
+            jl.nav.setPauseSceneBuilder((overlay: OverlayApi) => {
+                overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "entire_background.png" }, () => {
+                    console.log("hello!");
+                    jl.nav.doSplash(1);
+                    jl.nav.dismissOverlayScene();
+                    return true;
+            });
+                overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#ffffff", size: 100, z: 0 }, () => "CONGRATULATIONS!");
+                overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#ffffff", size: 80, z: 0 }, () => "Your score is " + score);
+
+            });
             console.log("end time is " + game_end)
-            winMessage(jl, score);
+            console.log("hello");
 
             return true;
         };
 
-        trigger1000.setHeroCollisionCallback(lc2);
+        trigger1000.setHeroCollisionCallback(lc1000);
         trigger1000.setCollisionsEnabled(false);
 
     //jl.world.makeDestination({ x: 126, y: 2, width: 4.5, height: 5, img: "flag.png" });
-    jl.score.setVictoryDestination(1);
+   // jl.score.setVictoryDestination(1);
 
     }
 }
@@ -2359,8 +2360,11 @@ function clean_date(){
 }
 
 function postAttempts(user_id: any, array: any){
-    //let a_url = 'http://localhost:8080/api/users/' + user_id + '/attempts'
-    let a_url = 'http://18.213.184.103:8080/api/users/' + user_id + '/attempts'
+    let a_url = 'http://localhost:8080/api/users/' + user_id + '/attempts'
+    //let a_url = 'http://18.213.184.103:8080/api/users/' + user_id + '/attempts'
+    console.log("the start time is: " + game_start);
+    console.log("the end time is " + game_end);
+    console.log("the difference in time is " + timeDiff(game_start, game_end));
     fetch(a_url, {
         method: "post",
         headers: {
@@ -2370,7 +2374,7 @@ function postAttempts(user_id: any, array: any){
                 world: "spaceQuest",
                 date: clean_date(),
                 totalscore: score,
-                totaltime: 172.2,
+                totaltime: timeDiff(game_start, game_end),
                 userId: user_id,
         })
     })
@@ -2378,7 +2382,6 @@ function postAttempts(user_id: any, array: any){
     .then( (response) => { 
         return response.json();
     }).then(jsonResponse => {
-        console.log("the id you want elene is " + jsonResponse.id.toString());
         postAnswers(array, jsonResponse.id.toString(), a_url);
 
     }).catch (error => {
@@ -2471,24 +2474,6 @@ export function questionScreen(jl: JetLagApi, message: string) {
     });
 }
 
-
-/**
- * This is a standard way of drawing a black screen with some text, to serve as
- * the win screen for the game
- */
-export function winMessage(jl: JetLagApi, score: Number, callback: () => void = null) {
-    jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {
-        overlay.addTapControl({ x: 0, y: 0, width: 16, height: 9, img: "entire_background.png" }, () => {
-            jl.nav.nextLevel();
-            return true;
-        });
-        overlay.addText({ center: true, x: 8, y: 1.75, face: "Arial", color: "#ffffff", size: 100, z: 0 }, () => "CONGRATULATIONS!");
-        overlay.addText({ center: true, x: 8, y: 4, face: "Arial", color: "#ffffff", size: 80, z: 0 }, () => "Your score is " + score + "/8");
-        //overlay.addText({ center: true, x: 8, y: 4.5, face: "Arial", color: "#FFFFFF", size: 28, z: 0 }, () => message);
-        if (callback !== null)
-            callback();
-    });
-}
 
 export function eleneMessage(jl: JetLagApi, message: string, callback: () => void = null) {
     jl.nav.setWinSceneBuilder((overlay: OverlayApi) => {

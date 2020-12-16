@@ -26,7 +26,7 @@ export class GameConfig extends JetLagConfig {
     this.adaptToScreenSize = true;
     this.pixelMeterRatio = 100;
     this.canVibrate = true;
-    this.debugMode = true; //this is the green lines
+    this.debugMode = false; //this is the green lines
     this.forceAccelerometerOff = true;
     this.verbosity = JetLagVerbosity.LOUD;
 
