@@ -2355,7 +2355,7 @@ function timeDiff(start: any, end: any){
 }
 
 function clean_date(){
-    let today = new Date().toISOString().slice(0, 10)
+    let today = new Date().toISOString()
     return today;
 }
 
